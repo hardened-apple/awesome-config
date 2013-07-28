@@ -1,4 +1,4 @@
--- Standard awesome library
+-- Standard awesome library {{{
 local gears = require("gears")
 local awful = require("awful")
 awful.rules = require("awful.rules")
@@ -10,16 +10,18 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
--- Will have to require something here to add the new menu I'll make
-local app_menu = require("my_menus.app_menu")
-local vicious = require("vicious")
-local threep  = require("mylayouts.threep")
-
-
-
+-- }}}
+-- Extra {{{
 -- Define some paths
 config        = awful.util.getdir("config")
 -- themedir      = config .. "/themes/personal"
+local ror = require("myfunctions.aweror")
+local vicious = require("vicious")
+local snap = require("myfunctions.snap")
+local app_menu = require("my_menus.app_menu")
+local mylayouts = require("mylayouts")
+-- local mywidgets = require("mywidgets")
+-- }}}
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -58,6 +60,7 @@ terminal = "xterm"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
+-- awful.util.spawn("xmodmap /home/matthew/.awesome_xmodmap")
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -69,13 +72,13 @@ modkey = "Mod4"
 local layouts =
 {
     awful.layout.suit.fair,
-    threep,
+    mylayouts.threep,
     awful.layout.suit.fair.horizontal,
     awful.layout.suit.tile,
     -- awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
-    awful.layout.suit.floating
+    awful.layout.suit.floating,
     --awful.layout.suit.spiral,
     --awful.layout.suit.spiral.dwindle,
     -- awful.layout.suit.max,
@@ -129,16 +132,17 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
-
+-- {{{ Widgets
+-- {{{ Define widgets
 myspacer = wibox.widget.textbox()
 myspacer:set_text(' ')
-myseparator = wibox.widget.textbox()
-myseparator:set_text(" - ")
+-- myseparator = wibox.widget.textbox()
+-- myseparator:set_text(" - ")
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
 vicious.register(wifiwidget, vicious.widgets.wifi,
-    function (widget, args)
+    function(widget, args)
         if args["{sign}"] == 0 then
             return "✗"
         else
@@ -165,19 +169,63 @@ vicious.register(mpdwidget, vicious.widgets.mpd,
         end
     end, 1)
 
+
+-- cpuwidget = awful.widget.graph()
+-- cpuwidget:set_width(50)
+-- cpuwidget:set_background_color("#222222")
+-- cpuwidget:set_color({type="linear", from={0, 0}, to={10, 0}, stops={ {0, "#FF5656"}, {0.5, "#88A175"}, {1, "#AECF96"}} })
+-- vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
+
+-- Main thing to change is the order that the revgraph widget puts new values
+-- on the graph when starting up - my current way of reversing the graph is a
+-- little silly
+-- ramwidget = mywidgets.revgraph()
+-- ramwidget:set_width(50)
+-- ramwidget:set_background_color("#222222")
+-- ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}} })
+-- vicious.register(ramwidget, vicious.widgets.mem, "$1")
+
+-- Remember I've modified the vicious widget slightly.
+-- It now reads the charge_full_design file instead of charge_full
+-- And returns the percent used, not percent remaining
+-- batwidget = awful.widget.progressbar()
+-- function battest()
+    -- local val_f = io.open('/sys/class/power_supply/BAT0/status', 'r')
+    -- local val = val_f:read()
+    -- val_f:close()
+    -- for line in io.lines('/sys/class/power_supply/BAT0/status') do
+        -- val = line
+    -- end
+    -- if val == 'Discharging' then
+        -- batwidget:set_width(100)
+        -- batwidget:set_height(7)
+        -- batwidget:set_vertical(false)
+    -- else
+        -- batwidget:set_width(0)
+        -- batwidget:set_height(0)
+    -- end
+-- end
+-- batwidget:set_background_color('#000000')
+-- batwidget:set_border_color(nil)
+-- batwidget:set_color("#00bfff")
+-- vicious.register(batwidget, vicious.widgets.bat, "$2", 60, "BAT0")
+-- battest()
+-- battimer = timer{timeout = 2}
+-- battimer:connect_signal("timeout", function() battest() end)
+-- battimer:start()
+
 datewidget = wibox.widget.textbox()
 vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
 
-
--- {{{ Wibox
--- Create a textclock widget
 -- mytextclock = awful.widget.textclock()
+-- }}}
 
 -- Create a wibox for each screen and add it
 mywibox = {}
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
+-- Buttons {{{
 mytaglist.buttons = awful.util.table.join(
                     awful.button({ }, 1, awful.tag.viewonly),
                     awful.button({ modkey }, 1, awful.client.movetotag),
@@ -235,29 +283,32 @@ for s = 1, screen.count() do
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
-    -- My tasklist style
-    mystyle = {
-        --floating = themedir .. "/layouts/balloons.png"
-    }
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons, mystyle)
+    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
+    -- }}}
 
-    -- Create the wibox
+    -- Create the wibox {{{
     mywibox[s] = awful.wibox({ position = "top", height = "15", screen = s })
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
+    -- left_layout:add(cpuwidget)
     left_layout:add(myspacer)
     left_layout:add(mpdwidget)
     left_layout:add(myspacer)
+    -- left_layout:add(batwidget)
     left_layout:add(mypromptbox[s])
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(myspacer)
+    -- right_layout:add(batwidget)
+    -- right_layout:add(myspacer)
+    -- right_layout:add(ramwidget)
+    -- right_layout:add(myspacer)
     right_layout:add(datewidget)
     right_layout:add(myspacer)
     right_layout:add(volwidget)
@@ -280,6 +331,7 @@ for s = 1, screen.count() do
     mywibox[s]:set_widget(layout)
 end
 -- }}}
+-- }}}
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
@@ -297,13 +349,13 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey,           }, "j",
         function ()
-            -- Change below to ...(-1) for original manner
+            -- Change below to ...( 1) for original manner
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
     awful.key({ modkey,           }, "k",
         function ()
-            -- Change below to ...( 1) for original way
+            -- Change below to ...(-1) for original way
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
@@ -366,12 +418,28 @@ clientkeys = awful.util.table.join(
             -- minimized, since minimized clients can't have the focus.
             c.minimized = true
         end),
+    -- Adding snap-to keybindings
+    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[1], "tl") end),
+    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[1], "tr") end),
+    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[1], "bl") end),
+    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[1], "br") end),
+    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[1], "brs") end),
+    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[1], "bml") end),
+    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[1], "tln") end),
+    -- Adding transparancy control
+    -- awful.key({ modkey }, "Next", function(c)
+        -- awful.util.spawn("transset-df --actual --dec 0.1") end),
+    -- awful.key({ modkey }, "Prior", function(c)
+        -- awful.util.spawn("transset-df --actual --inc 0.1") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
+--
+-- Add ror to globalkeys
+globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
 
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it works on any keyboard layout.
@@ -430,7 +498,6 @@ awful.rules.rules = {
                      focus = awful.client.focus.filter,
                      keys = clientkeys,
                      buttons = clientbuttons,
-                     -- Can still toggle transparancy
                      opacity = 1,
                      size_hints_honor = false } },
     { rule = { class = "MPlayer" },
@@ -442,20 +509,22 @@ awful.rules.rules = {
     -- Set Firefox to always map on tags number 9 of screen 1.
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    -- maximized_vertical = true, maximized_horizontal = true } },
     -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
-    -- Make terminals transparent
-    { rule = { class = "XTerm" },
-      properties = { opacity=0.6 } },
-    -- Make rox floating
-    { rule = { class = "ROX-Filer" },
+    -- { rule = { name = "Figure 1" },
+      -- properties = { floating = true } },
+  -- make feh floating
+    { rule = { class = "feh" },
       properties = { floating = true } },
-      -- Titlebar added in signal below
+    { rule = { class = "XTerm" },
+      properties = { opacity = 0.6 } },
+    -- Rox - floating, titlebar added in manage signal (below)
+    -- { rule = { class = "ROX-Filer" },
+      -- properties = { floating = true } },
 }
 -- }}}
 
@@ -482,27 +551,8 @@ client.connect_signal("manage", function (c, startup)
         end
     end
 
-    -- Here I'm attmepting to read which tag the client is starting
-    -- on, then set the opacity based on that
-    -- The file I/O below is there to attempt to see what the tags are
-    -- here, as it may be that they're not set yet (I don't know)
-    -- local mytagtoseefile = io.open("/home/matthew/awesometags.txt", "w")
-    -- local string_of_tags = {"return {"}
-    -- for i=1,#c:tags() do
-    --     string_of_tags[#string_of_tags+1] = "{"
-    --     string_of_tags[#string_of_tags+1] = c:tags()[i]
-    --     string_of_tags[#string_of_tags+1] = ","
-    -- end
-    -- string_of_tags[#string_of_tags+1] = "}"
-    -- string_of_tags = table.concat(string_of_tags)
-    -- mytagtoseefile:write(string_of_tags)
-    -- mytagtoseefile:close()
-    -- if c:tags()[1] == 7 then
-    --     c.opacity = 0.5
-    -- end
-    -- All the if statement irrelevant, have "false"
     local titlebars_enabled = false
-    if c.class == "ROX-Filer" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
+    if c.class == "feh" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
         -- buttons for the titlebar
         local buttons = awful.util.table.join(
                 awful.button({ }, 1, function()
@@ -556,9 +606,8 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- Note: If you want to run a shell command, or a command using redirection
 --      use     awful.util.spawn_with_shell("<command>")
 
--- Attempt to make all clients on tag 7 slightly transparent
 
 -- Setting the font
--- awesome.font = theme.font
+-- awesome.font = 
 
--- vim: set foldmethod=marker
+-- vim: set foldmethod=marker:

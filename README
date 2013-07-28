@@ -1,5 +1,7 @@
 Repo to hold my awesome window manager configuration.
 
+Run or Raise function taken from the awesome wiki
+(awesome.naquadah.org/wiki/Run_or_raise)
 The shifty and vicious folders are taken from
 https://github.com/cdump/awesome-shifty and git.sysphere.org/vicious/ (through the vicious arch package)
 

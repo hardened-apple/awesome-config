@@ -21,6 +21,16 @@ function snap.snapwin(c, scr, pos)
         g.height = wa.height * 0.35
         g.x = wa.width * 0.994 - g.width
         g.y = wa.height * 0.99 - g.height + offset
+    elseif pos == "bml" then
+        g.width = wa.width
+        g.height = wa.height * 0.3
+        g.x = 0
+        g.y = wa.height*0.7 + offset
+    elseif pos == "tln" then
+        g.height = wa.height * 0.45
+        g.width = wa.width * 0.45
+        g.x = wa.width * 0.99 - g.width
+        g.y = wa.height * 0.01 + offset
     end
     c:geometry(g)
 end

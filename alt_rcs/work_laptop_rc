@@ -1,5 +1,4 @@
--- Import standards {{{
--- Standard awesome library
+-- Standard awesome library {{{
 local gears = require("gears")
 local awful = require("awful")
 awful.rules = require("awful.rules")
@@ -11,19 +10,18 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
--- }}} 
--- Extras {{{
+-- }}}
+-- Extra {{{
 -- Define some paths
 config        = awful.util.getdir("config")
-themedir      = config .. "/themes/personal"
+-- themedir      = config .. "/themes/personal"
 -- Will have to require something here to add the new menu I'll make
 local ror = require("myfunctions.aweror")
-local vicious   = require("vicious")
--- Will have to require something here to add the new menu I'll make
-local mynewmenu = require("mymenus.mynewmenu")
-local mylayouts    = require("mylayouts")
-local mywidgets = require("mywidgets")
+local vicious = require("vicious")
 local snap = require("myfunctions.snap")
+local app_menu = require("my_menus.app_menu")
+local mylayouts = require("mylayouts")
+local mywidgets = require("mywidgets")
 -- }}}
 
 -- {{{ Error handling
@@ -76,9 +74,9 @@ local layouts =
 {
     awful.layout.suit.fair,
     mylayouts.threep,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
     awful.layout.suit.fair.horizontal,
+    awful.layout.suit.tile,
+    -- awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
     awful.layout.suit.floating,
@@ -123,7 +121,7 @@ myawesomemenu = {
 
 -- Add menu in here
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Applications", mynewmenu.My_menu.Applications },
+                                    { "Applications", app_menu.menu.Applications, beautiful.app_menu_icon },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -135,11 +133,22 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
--- {{{ Wibox
-
--- {{{ Define widgets
-myspacer    = wibox.widget.textbox()
+-- {{{ Widgets
+myspacer = wibox.widget.textbox()
 myspacer:set_text(' ')
+-- myseparator = wibox.widget.textbox()
+-- myseparator:set_text(" - ")
+
+-- Wifi widget - just tell me if the wifi is up
+wifiwidget = wibox.widget.textbox()
+vicious.register(wifiwidget, vicious.widgets.wifi,
+    function(widget, args)
+        if args["{sign}"] == 0 then
+            return "✗"
+        else
+            return "✓"
+        end
+    end, 10, "wlp12s0")
 
 -- volume widget
 volwidget = wibox.widget.textbox()
@@ -150,16 +159,16 @@ vicious.register(volwidget, vicious.widgets.volume,
 
 
 -- mpd widget, what song is playing
-mpdwidget = wibox.widget.textbox()
-vicious.register(mpdwidget, vicious.widgets.mpd,
-    function (mpdwidget, args)
-        if args["{state}"] == "Stop" then
-            return "  "
-        else
+-- mpdwidget = wibox.widget.textbox()
+-- vicious.register(mpdwidget, vicious.widgets.mpd,
+    -- function (mpdwidget, args)
+        -- if args["{state}"] == "Stop" then
+            -- return "  "
+        -- else
             -- return args["{Artist}"]..' - '.. args["{Title}"]
-            return ' ' .. args["{Title}"] .. ' '
-        end
-    end, 1)
+            -- return ' ' .. args["{Title}"] .. ' '
+        -- end
+    -- end, 1)
 
 
 cpuwidget = awful.widget.graph()
@@ -176,17 +185,6 @@ ramwidget:set_width(50)
 ramwidget:set_background_color("#222222")
 ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}} })
 vicious.register(ramwidget, vicious.widgets.mem, "$1")
-
-wifiwidget  = wibox.widget.textbox()
-vicious.register(wifiwidget, vicious.widgets.wifi,
-    function(widget, args)
-        if args["{sign}"] == 0 then
-            return "✗"
-        else
-            return "✓"
-        end
-    end, 10, "wlp12s0")
-
 
 -- Remember I've modified the vicious widget slightly.
 -- It now reads the charge_full_design file instead of charge_full
@@ -217,11 +215,13 @@ battimer = timer{timeout = 2}
 battimer:connect_signal("timeout", function() battest() end)
 battimer:start()
 
--- Create a textclock widget
+-- datewidget = wibox.widget.textbox()
+-- vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
+
 mytextclock = awful.widget.textclock()
 -- }}}
 
--- Create a wibox for each screen and add it {{{
+-- Create a wibox for each screen and add it
 mywibox = {}
 mypromptbox = {}
 mylayoutbox = {}
@@ -293,7 +293,6 @@ for s = 1, screen.count() do
     -- }}}
 
     -- Create the wibox {{{
-    -- I specified the height (shrink it a little)
     mywibox[s] = awful.wibox({ position = "top", height = "15", screen = s })
 
     -- Widgets that are aligned to the left
@@ -302,6 +301,8 @@ for s = 1, screen.count() do
     left_layout:add(mytaglist[s])
     left_layout:add(cpuwidget)
     left_layout:add(myspacer)
+    -- left_layout:add(mpdwidget)
+    -- left_layout:add(myspacer)
     left_layout:add(batwidget)
     left_layout:add(mypromptbox[s])
 
@@ -309,12 +310,17 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(myspacer)
+    -- right_layout:add(batwidget)
     -- right_layout:add(myspacer)
-    -- right_layout:add(pkgwidget)
     right_layout:add(ramwidget)
     right_layout:add(myspacer)
-    -- right_layout:add(wifiwidget)
+    -- right_layout:add(datewidget)
+    -- right_layout:add(myspacer)
     right_layout:add(volwidget)
+    right_layout:add(myspacer)
+    -- right_layout:add(wifiwidget)
+    -- right_layout:add(myspacer)
+    -- right_layout:add(myspacer)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
     --right_layout:add(smallcross)
@@ -362,16 +368,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
 
     -- Layout manipulation
-    -- Reverse the direction they move - it seems more intuitive this way
-    --
-    --awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
-    --awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
-    --awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
-    --awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
-    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx( -1)    end),
-    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx(  1)    end),
-    awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative(-1) end),
-    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative( 1) end),
+    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
+    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
+    awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
+    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
         function ()
@@ -396,6 +396,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
+
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
 
@@ -429,6 +430,8 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[1], "bl") end),
     awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[1], "br") end),
     awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[1], "brs") end),
+    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[1], "bml") end),
+    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[1], "tln") end),
     -- Adding transparancy control
     awful.key({ modkey }, "Next", function(c)
         awful.util.spawn("transset-df --actual --dec 0.1") end),
@@ -482,7 +485,6 @@ for i = 1, 9 do
 end
 
 
-
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c end), -- ; c:raise() end),
     -- add the c:raise() in above function to allow raise on click
@@ -501,10 +503,8 @@ awful.rules.rules = {
                      border_color = beautiful.border_normal,
                      focus = awful.client.focus.filter,
                      keys = clientkeys,
-                     -- Make all windows transparent
-                     opacity = 1,
-                     -- Is fine as does nothing until I turn xcomp on
                      buttons = clientbuttons,
+                     opacity = 1,
                      size_hints_honor = false } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
@@ -525,16 +525,11 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "feh" },
       properties = { floating = true } },
-    { rule = { class = "XTerm"   },
+    { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
     -- Rox - floating, titlebar added in manage signal (below)
     { rule = { class = "ROX-Filer" },
       properties = { floating = true } },
-      -- callback = awful.titlebar.add },
-    -- Set "Display" to always be floating
-    --{ rule = { class = "Display" }, 
-      --properties = { floating = true } },
-    -- is a bit odd - not sure why
 }
 -- }}}
 
@@ -562,10 +557,7 @@ client.connect_signal("manage", function (c, startup)
     end
 
     local titlebars_enabled = false
-    -- I added the ROX-Filer part here
     if c.class == "feh" or c.class == "ROX-Filer" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
-        -- Copied over difference from new rc.lua (upgrade package)
-        -- will remove old version once certain this works.
         -- buttons for the titlebar
         local buttons = awful.util.table.join(
                 awful.button({ }, 1, function()
@@ -618,11 +610,9 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- Changes below are things I've added
 -- Note: If you want to run a shell command, or a command using redirection
 --      use     awful.util.spawn_with_shell("<command>")
---
--- Can use awful.util.spawn(...) to open a specific app on startup.
 
 
 -- Setting the font
--- awesome.font =  "12x24romankana 8"
+-- awesome.font = 
 
 -- vim: set foldmethod=marker:
