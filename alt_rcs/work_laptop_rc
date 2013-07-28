@@ -15,7 +15,6 @@ local menubar = require("menubar")
 -- Define some paths
 config        = awful.util.getdir("config")
 -- themedir      = config .. "/themes/personal"
--- Will have to require something here to add the new menu I'll make
 local ror = require("myfunctions.aweror")
 local vicious = require("vicious")
 local snap = require("myfunctions.snap")
@@ -102,7 +101,7 @@ end
 tags = {
     -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
     names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
-    layout = { layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[8] }
+    layout = { layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[7] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -122,6 +121,7 @@ myawesomemenu = {
 -- Add menu in here
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "Applications", app_menu.menu.Applications, beautiful.app_menu_icon },
+                                    -- { "Firefox", "/usr/bin/firefox" },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -134,6 +134,7 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- {{{ Widgets
+-- {{{ Define widgets
 myspacer = wibox.widget.textbox()
 myspacer:set_text(' ')
 -- myseparator = wibox.widget.textbox()
@@ -156,7 +157,6 @@ vicious.register(volwidget, vicious.widgets.volume,
     function(widget, args)
         return ' ' .. args[2] .. ':' .. args[1] .. ' '
     end, 1, "Master")
-
 
 -- mpd widget, what song is playing
 -- mpdwidget = wibox.widget.textbox()
@@ -284,12 +284,8 @@ for s = 1, screen.count() do
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
-    -- My tasklist style
-    mystyle = {
-        --floating = themedir .. "/layouts/balloons.png"
-    }
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons, mystyle)
+    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
     -- }}}
 
     -- Create the wibox {{{
@@ -335,7 +331,6 @@ for s = 1, screen.count() do
 
     mywibox[s]:set_widget(layout)
 end
--- }}}
 -- }}}
 -- }}}
 
