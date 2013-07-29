@@ -590,7 +590,7 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
     awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
     awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "tln") end),
+    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "trn") end),
     -- Adding transparancy control
     -- awful.key({ modkey }, "Next", function(c)
         -- awful.util.spawn("transset-df --actual --dec 0.1") end),
