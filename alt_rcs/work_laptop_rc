@@ -420,13 +420,13 @@ clientkeys = awful.util.table.join(
             c.minimized = true
         end),
     -- Adding snap-to keybindings
-    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[1], "tl") end),
-    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[1], "tr") end),
-    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[1], "bl") end),
-    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[1], "br") end),
-    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[1], "brs") end),
-    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[1], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[1], "tln") end),
+    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[c.screen], "tl") end),
+    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[c.screen], "tr") end),
+    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[c.screen], "bl") end),
+    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
+    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
+    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
+    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "tln") end),
     -- Adding transparancy control
     awful.key({ modkey }, "Next", function(c)
         awful.util.spawn("transset-df --actual --dec 0.1") end),
