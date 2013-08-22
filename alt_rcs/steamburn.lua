@@ -1,3 +1,11 @@
+--[[                                     ]]--
+--                                         -
+--    Steamburn Awesome WM 3.5.+ config    --
+--        github.com/copycat-killer        --
+--                                         -
+--[[                                     ]]--
+
+
 -- Standard awesome library {{{
 local gears           = require("gears")
 local awful           = require("awful")
@@ -17,7 +25,18 @@ local vicious    = require("vicious")
 local snap       = require("myfunctions.snap")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
-local mywidgets  = require("mywidgets")
+-- }}}
+
+-- {{{ Autostart applications 
+
+function run_once(cmd)
+  findme = cmd
+  firstspace = cmd:find(" ")
+  if firstspace then
+     findme = cmd:sub(0, firstspace-1)
+  end
+  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+ end
 -- }}}
 
 -- {{{ Error Handling
@@ -48,13 +67,15 @@ end
 
 -- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init(configdir .. "/themes/personal/theme.lua")
+beautiful.init(configdir .. "/themes/steamburn/theme.lua")
 
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xterm"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
+wifi = terminal .. " -e sudo wifi-menu "
+musicplr = terminal .. " -g 78x22 -e ncmpcpp"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -64,13 +85,17 @@ altkey = "Mod1"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
-    awful.layout.suit.fair,
-    mylayouts.threep,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.floating,
+    awful.layout.suit.floating,             -- 1
+    awful.layout.suit.tile,                 -- 2
+    awful.layout.suit.tile.left,            -- 3
+    awful.layout.suit.tile.bottom,          -- 4
+    awful.layout.suit.tile.top,             -- 5
+    awful.layout.suit.fair,                 -- 6
+    awful.layout.suit.fair.horizontal,      -- 7
+    awful.layout.suit.spiral,               -- 8
+    awful.layout.suit.spiral.dwindle,       -- 9
+    awful.layout.suit.max,                  -- 10
+    mylayouts.tilegaps,                     -- 11
 }
 -- }}}
 
@@ -84,9 +109,8 @@ end
 
 -- {{{ Tags
 tags = {
-    -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
-    names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
-    layout = { layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[7] }
+       names = { "web", "term", "docs", "media", "down"},
+       layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -105,7 +129,7 @@ myawesomemenu = {
 
 -- Add menu in here
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Applications", app_menu.menu.Applications, beautiful.app_menu_icon },
+                                    { "Firefox", "/usr/bin/firefox" },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -119,64 +143,18 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Widgets
 -- {{{ Define widgets
-myspacer = wibox.widget.textbox()
-myspacer:set_text(' ')
+-- Separators
+spr = wibox.widget.textbox(' ')
+leftbr = wibox.widget.textbox(' [')
+rightbr = wibox.widget.textbox('] ')
 
--- Wifi widget - just tell me if the wifi is up
-wifiwidget = wibox.widget.textbox()
-vicious.register(wifiwidget, vicious.widgets.wifi,
-    function(widget, args)
-        if args["{sign}"] == 0 then
-            return "✗"
-        else
-            return "✓"
-        end
-    end, 10, "wlp12s0")
+-- Colours
+coldef  = "</span>"
+white  = "<span color='#cdcdcd'>"
+gray = "<span color='#94928f'>"
 
--- volume widget
-volwidget = wibox.widget.textbox()
-vicious.register(volwidget, vicious.widgets.volume,
-    function(widget, args)
-        return ' ' .. args[2] .. ':' .. args[1] .. ' '
-    end, 1, "Master")
-
--- mpd widget, what song is playing
-mpdwidget = wibox.widget.textbox()
-vicious.register(mpdwidget, vicious.widgets.mpd,
-    function (mpdwidget, args)
-        if args["{state}"] == "Stop" then
-            return "  "
-        else
-            return ' ' .. args["{Title}"] .. ' '
-        end
-    end, 1)
-
-
-
-function battest()
-    local val_f = io.open('/sys/class/power_supply/BAT0/status', 'r')
-    local val = val_f:read("*line")
-    val_f:close()
-    if val == 'Discharging' then
-        batwidget:set_width(100)
-        batwidget:set_height(7)
-        batwidget:set_vertical(false)
-    else
-        batwidget:set_width(0)
-        batwidget:set_height(0)
-    end
-end
-
-batwidget:set_background_color('#000000')
-batwidget:set_border_color(nil)
-batwidget:set_color("#00bfff")
-vicious.register(batwidget, vicious.widgets.bat, "$2", 60, "BAT0")
-battest()
-battimer = timer{timeout = 2}
-battimer:connect_signal("timeout", function() battest() end)
-battimer:start()
-
-
+-- Textclock widget
+mytextclock = awful.widget.textclock(white .. "%H:%M"  .. coldef)
 
 -- {{{ Calendar functions
 -- taken from copycat-killer/awesome-copycats
@@ -291,11 +269,195 @@ function add_calendar(t_out)
                             })
 end
 -- }}}
-mytextclock = awful.widget.textclock()
+
 mytextclock:connect_signal("mouse::enter", function() show(0) end)
 mytextclock:connect_signal("mouse::leave", hide)
-mytextclock.buttons(util.table.join( awful.button({ }, 1, function() show(-1) end),
+mytextclock:buttons(util.table.join( awful.button({ }, 1, function() show(-1) end),
                                      awful.button({ }, 3, function() show(1) end)))
+
+-- Mail widget
+mygmail = wibox.widget.textbox()
+notify_shown = false
+vicious.register(mygmail, vicious.widgets.gmail,
+ function (widget, args)
+  notify_title = "You have a new message."
+  notify_text = '"' .. args["{subject}"] .. '"'
+  if (args["{count}"] > 0 ) then
+    if (notify_shown == false) then
+      if (args["{count}"] == 1) then
+          notify_title = "You have 1 new message"
+          notify_text = args["{subject}"]
+      else
+          notify_title = "You have " .. noti .. " new messages"
+          notify_text = 'On: "' .. args["{subject}"] .. '"'
+      end
+      naughty.notify({ title = notify_title, text = notify_text,
+      timeout = 7,
+      position = "top_left",
+      icon = beautiful.widget_mail_notify,
+      fg = beautiful.fg_urgent,
+      bg = beautiful.bg_urgent })
+      notify_shown = true
+    end
+    return gray .. " Mail " .. coldef .. white .. args["{count}"] .. " " .. coldef
+  else
+    notify_shown = false
+    return ''
+  end
+end, 60)
+
+-- Mpd widget
+mpdwidget = wibox.widget.textbox()
+mpdwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn_with_shell(musicplr) end)))
+curr_track = nil
+vicious.register(mpdwidget, vicious.widgets.mpd,
+function(widget, args)
+    if (args["{state}"] == "Play") then
+    if( args["{Title}"] ~= curr_track )
+    then
+        curr_track = args["{Title}"]
+        os.execute(scriptdir .. "mpdinfo")
+        old_id = naughty.notify({
+            title = "Now playing",
+            text = args["{Artist}"] .. " (" .. args["{Album}"] .. ")\n" .. args["{Title}"],
+            icon = "/tmp/mpdnotify_cover.png",
+            timeout = 5,
+            replaces_id = old_id
+        }).id
+    end
+        return gray .. args["{Title}"] .. coldef .. white .. " " .. args["{Artist}"] .. coldef
+    elseif (args["{state}"] == "Pause") then
+        return gray .. "mpd " .. coldef .. white .. "paused" .. coldef
+    else
+        return ""
+    end
+end, 1)
+
+-- MEM widget
+memwidget = wibox.widget.textbox()
+vicious.register(memwidget, vicious.widgets.mem, gray .. "Mem " .. coldef .. white .. "$2 " .. coldef, 13) -- in Megabytes
+
+-- CPU widget
+cpuwidget = wibox.widget.textbox()
+vicious.register(cpuwidget, vicious.widgets.cpu, gray .. "Cpu " .. coldef .. white .. "$1 " .. coldef, 3)
+
+-- Temp widget
+tempwidget = wibox.widget.textbox()
+vicious.register(tempwidget, vicious.widgets.thermal, gray .. "Temp " .. coldef .. white .. "$1 " .. coldef, 9, {"coretemp.0", "core"} )
+
+-- /home fs widget
+fshwidget = wibox.widget.textbox()
+vicious.register(fshwidget, vicious.widgets.fs,
+function (widget, args)
+  if ( args["{/home/apple/share used_p}"] >= 99 ) then
+    naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
+    timeout = 10,
+    position = "top_right",
+    fg = beautiful.fg_urgent,
+    bg = beautiful.bg_urgent })
+  end
+  return gray .. "Hdd " .. coldef .. white .. args["{/home/apple/share used_p}"] .. coldef
+end, 600)
+
+local infos = nil
+
+function remove_info()
+    if infos ~= nil then
+        naughty.destroy(infos)
+        infos = nil
+    end
+end
+
+function add_info()
+    remove_info()
+    local capi = {
+        mouse = mouse,
+        screen = screen
+      }
+    local cal = awful.util.pread(scriptdir .. "dfs")
+    cal = string.gsub(cal, "          ^%s*(.-)%s*$", "%1")
+    infos = naughty.notify({
+        text = string.format('<span font_desc="%s">%s</span>', "Tamsyn", cal),
+        timeout = 0,
+        position = "top_right",
+        margin = 10,
+        height = 210,
+        width = 680,
+        screen  = capi.mouse.screen
+    })
+end
+
+fshwidget:connect_signal('mouse::enter', function () add_info() end)
+fshwidget:connect_signal('mouse::leave', function () remove_info() end)
+
+-- Battery widget
+function batstate()
+
+  local file = io.open("/sys/class/power_supply/BAT0/status", "r")
+
+  if (file == nil) then
+    return "Cable plugged"
+  end
+
+  local batstate = file:read("*line")
+  file:close()
+
+  if (batstate == 'Discharging' or batstate == 'Charging') then
+    return batstate
+  else
+    return "Fully charged"
+  end
+end
+
+batwidget = wibox.widget.textbox()
+vicious.register(batwidget, vicious.widgets.bat,
+function (widget, args)
+  -- plugged
+  if (batstate() == 'Cable plugged' or batstate() == 'Unknown') then
+    return ''
+    -- critical
+  elseif (args[2] <= 5 and batstate() == 'Discharging') then
+    naughty.notify({
+      text = "battery about to die...",
+      title = "Urgent Battery State",
+      position = "top_right",
+      timeout = 1,
+      fg="#000000",
+      bg="#ffffff",
+      screen = 1,
+      ontop = true,
+    })
+    -- low
+  elseif (args[2] <= 10 and batstate() == 'Discharging') then
+    naughty.notify({
+      text = "battery is low",
+      title = "Battery Warning",
+      position = "top_right",
+      timeout = 1,
+      fg="#ffffff",
+      bg="#262729",
+      screen = 1,
+      ontop = true,
+    })
+  end
+  return gray .. "Bat " .. coldef .. white .. args[2] .. " " .. coldef
+end, 1, 'BAT0')
+
+-- Volume widget
+volumewidget = wibox.widget.textbox()
+vicious.register(volumewidget, vicious.widgets.volume,
+function (widget, args)
+  if (args[2] ~= "♩" ) then
+     return gray .. "Vol " .. coldef .. white .. args[1] .. " " .. coldef
+  else
+     return gray .. "Vol " .. coldef .. white .. "mute " .. coldef
+  end
+end, 1, "Master")
+
+-- Net widget
+netwidget = wibox.widget.textbox()
+vicious.register(netwidget, vicious.widgets.net, gray .. "Net " .. coldef .. white .. "${wlp5s0 down_kb} " .. "<span font=\"Terminus 8\">↓↑ </span>" .. "${wlp5s0 up_kb} " .. coldef, 3)
+netwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn_with_shell(wifi) end)))
 
 
 -- }}}
@@ -365,32 +527,44 @@ for s = 1, screen.count() do
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
-    -- }}}
+-- }}}
 
     -- Create the wibox {{{
-    mywibox[s] = awful.wibox({ position = "top", height = "15", screen = s })
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 18 })
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
-    left_layout:add(mylauncher)
+    left_layout:add(spr)
     left_layout:add(mytaglist[s])
-    left_layout:add(cpuwidget)
-    left_layout:add(myspacer)
-    left_layout:add(mpdwidget)
+    left_layout:add(leftbr)
+    left_layout:add(mylayoutbox[s])
+    left_layout:add(rightbr)
     left_layout:add(mypromptbox[s])
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    right_layout:add(myspacer)
-    right_layout:add(ramwidget)
-    right_layout:add(myspacer)
+    right_layout:add(spr)
+    right_layout:add(mpdwidget)
+    right_layout:add(spr)
+    right_layout:add(mygmail)
+    right_layout:add(spr)
+    right_layout:add(cpuwidget)
+    right_layout:add(spr)
+    right_layout:add(memwidget)
+    right_layout:add(spr)
+    right_layout:add(tempwidget)
+    right_layout:add(spr)
+    right_layout:add(fshwidget)
+    right_layout:add(spr)
     right_layout:add(batwidget)
-    right_layout:add(myspacer)
-    right_layout:add(volwidget)
-    right_layout:add(myspacer)
+    right_layout:add(spr)
+    right_layout:add(netwidget)
+    right_layout:add(spr)
+    right_layout:add(volumewidget)
+    right_layout:add(spr)
     right_layout:add(mytextclock)
-    right_layout:add(mylayoutbox[s])
+    right_layout:add(spr)
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
@@ -413,6 +587,14 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(
+
+    -- Move clients
+    awful.key({ altkey }, "Next",  function () awful.client.moveresize( 1,  1, -2, -2) end),
+    awful.key({ altkey }, "Prior", function () awful.client.moveresize(-1, -1,  2,  2) end),
+    awful.key({ altkey }, "Down",  function () awful.client.moveresize(  0,  1,   0,   0) end),
+    awful.key({ altkey }, "Up",    function () awful.client.moveresize(  0, -1,   0,   0) end),
+    awful.key({ altkey }, "Left",  function () awful.client.moveresize(-1,   0,   0,   0) end),
+    awful.key({ altkey }, "Right", function () awful.client.moveresize( 1,   0,   0,   0) end),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
@@ -427,7 +609,12 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
+    awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
+
+    -- Show/Hide Wibox
+    awful.key({ modkey }, "b", function ()
+    mywibox[mouse.screen].visible = not mywibox[mouse.screen].visible
+    end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -579,22 +766,18 @@ awful.rules.rules = {
       properties = { floating = true } },
     -- Set Firefox to always map on tags number 9 of screen 1.
     { rule = { class = "Firefox" },
-      properties = { tag = tags[1][9], floating = true } },
+      properties = { tag = tags[1][1], floating = true } },
     -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
-    { rule = { name = "Figure 1" },
-      properties = { floating = true } },
+  -- make feh floating
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
-    -- Rox - floating, titlebar added in manage signal (below)
-    { rule = { class = "ROX-Filer" },
-      properties = { floating = true } },
 }
 -- }}}
 
@@ -622,7 +805,7 @@ client.connect_signal("manage", function (c, startup)
     end
 
     local titlebars_enabled = false
-    if c.class == "feh" or c.class == "ROX-Filer" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
+    if c.class == "feh" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
         -- buttons for the titlebar
         local buttons = awful.util.table.join(
                 awful.button({ }, 1, function()

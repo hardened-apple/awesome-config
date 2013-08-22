@@ -1,29 +1,26 @@
 -- Standard awesome library {{{
-local gears = require("gears")
-local awful = require("awful")
-awful.rules = require("awful.rules")
+local gears           = require("gears")
+local awful           = require("awful")
+awful.rules           = require("awful.rules")
 require("awful.autofocus")
--- Widget and layout library
-local wibox = require("wibox")
--- Theme handling library
-local beautiful = require("beautiful")
--- Notification library
-local naughty = require("naughty")
-local menubar = require("menubar")
+local wibox           = require("wibox")
+local beautiful       = require("beautiful")
+local naughty         = require("naughty")
+local menubar         = require("menubar")
 -- }}}
 -- Extra {{{
 -- Define some paths
-config        = awful.util.getdir("config")
--- themedir      = config .. "/themes/personal"
-local ror = require("myfunctions.aweror")
-local vicious = require("vicious")
-local snap = require("myfunctions.snap")
-local app_menu = require("my_menus.app_menu")
-local mylayouts = require("mylayouts")
--- local mywidgets = require("mywidgets")
+configdir        = awful.util.getdir("config")
+scriptdir        = configdir .. "/scripts/"
+local ror        = require("myfunctions.aweror")
+local vicious    = require("vicious")
+local snap       = require("myfunctions.snap")
+local app_menu   = require("my_menus.app_menu")
+local mylayouts  = require("mylayouts")
 -- }}}
 
--- {{{ Error handling
+-- {{{ Error Handling
+
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
 if awesome.startup_errors then
@@ -48,11 +45,9 @@ do
 end
 -- }}}
 
--- {{{ Variable definitions
+-- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
---beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-beautiful.init(awful.util.getdir("config") .. "/themes/muted-dream-tree/theme.lua")
--- beautiful.init(awful.util.getdir("config") .. "/themes/dust/theme.lua")
+beautiful.init(configdir .. "/themes/muted-dream-tree/theme.lua")
 
 
 -- This is used later as the default terminal and editor to run.
@@ -60,30 +55,24 @@ terminal = "xterm"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
--- awful.util.spawn("xmodmap /home/matthew/.awesome_xmodmap")
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
--- If you do not like this or do not have such a key,
--- I suggest you to remap Mod4 to another key using xmodmap or other tools.
--- However, you can use another modifier like Mod1, but it may interact with others.
 modkey = "Mod4"
+altkey = "Mod1"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
     awful.layout.suit.fair,
+    mylayouts.fairgaps,
     mylayouts.threep,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.tile,
-    -- awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
+    mylayouts.fairgaps.horizontal,
+    mylayouts.tilegaps,
+    mylayouts.tilegaps.left,
+    mylayouts.tilegaps.bottom,
+    mylayouts.tilegaps.top,
     awful.layout.suit.floating,
-    --awful.layout.suit.spiral,
-    --awful.layout.suit.spiral.dwindle,
-    -- awful.layout.suit.max,
-    -- awful.layout.suit.max.fullscreen,
-    -- awful.layout.suit.magnifier
+    mylayouts.spiralgaps,
 }
 -- }}}
 
@@ -96,12 +85,10 @@ end
 -- }}}
 
 -- {{{ Tags
--- Define a tag table which hold all screen tags.
--- can change this to make each tag layout different
+
 tags = {
-    -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
     names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
-    layout = { layouts[2], layouts[1], layouts[1], layouts[2], layouts[2], layouts[1], layouts[7], layouts[2], layouts[7] }
+    layout = { layouts[3], layouts[1], layouts[2], layouts[1], layouts[4], layouts[1], layouts[5], layouts[7], layouts[9] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -134,10 +121,7 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Widgets
 -- {{{ Define widgets
-myspacer = wibox.widget.textbox()
-myspacer:set_text(' ')
--- myseparator = wibox.widget.textbox()
--- myseparator:set_text(" - ")
+myspacer = wibox.widget.textbox(' ')
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
@@ -158,66 +142,159 @@ vicious.register(volwidget, vicious.widgets.volume,
     end, 1, "Master")
 
 -- mpd widget, what song is playing
+-- taken from copycat-killer/awesome-copycats
+coldef  = "</span>"
+white  = "<span color='#cdcdcd'>"
+gray = "<span color='#94928f'>"
 mpdwidget = wibox.widget.textbox()
+curr_track = nil
 vicious.register(mpdwidget, vicious.widgets.mpd,
-    function (mpdwidget, args)
-        if args["{state}"] == "Stop" then
-            return "  "
-        else
-            -- return args["{Artist}"]..' - '.. args["{Title}"]
-            return ' ' .. args["{Title}"] .. ' '
-        end
-    end, 1)
+function(widget, args)
+    if (args["{state}"] == "Play") then
+    if( args["{Title}"] ~= curr_track )
+    then
+        curr_track = args["{Title}"]
+        os.execute(scriptdir .. "mpdinfo")
+        old_id = naughty.notify({
+            title = "Now playing",
+            text = args["{Artist}"] .. " (" .. args["{Album}"] .. ")\n" .. args["{Title}"],
+            icon = "/tmp/mpdnotify_cover.png",
+            timeout = 5,
+            replaces_id = old_id
+        }).id
+    end
+        return gray .. args["{Title}"] .. coldef .. white .. " " .. args["{Artist}"] .. coldef
+    elseif (args["{state}"] == "Pause") then
+        return gray .. "mpd " .. coldef .. white .. "paused" .. coldef
+    else
+        return ""
+    end
+end, 1)
 
 
--- cpuwidget = awful.widget.graph()
--- cpuwidget:set_width(50)
--- cpuwidget:set_background_color("#222222")
--- cpuwidget:set_color({type="linear", from={0, 0}, to={10, 0}, stops={ {0, "#FF5656"}, {0.5, "#88A175"}, {1, "#AECF96"}} })
--- vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
--- Main thing to change is the order that the revgraph widget puts new values
--- on the graph when starting up - my current way of reversing the graph is a
--- little silly
--- ramwidget = mywidgets.revgraph()
--- ramwidget:set_width(50)
--- ramwidget:set_background_color("#222222")
--- ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}} })
--- vicious.register(ramwidget, vicious.widgets.mem, "$1")
+-- {{{ Calendar functions
+-- taken from copycat-killer/awesome-copycats
+local os = os
+local string = string
+local table = table
+local util = awful.util
 
--- Remember I've modified the vicious widget slightly.
--- It now reads the charge_full_design file instead of charge_full
--- And returns the percent used, not percent remaining
--- batwidget = awful.widget.progressbar()
--- function battest()
-    -- local val_f = io.open('/sys/class/power_supply/BAT0/status', 'r')
-    -- local val = val_f:read()
-    -- val_f:close()
-    -- for line in io.lines('/sys/class/power_supply/BAT0/status') do
-        -- val = line
-    -- end
-    -- if val == 'Discharging' then
-        -- batwidget:set_width(100)
-        -- batwidget:set_height(7)
-        -- batwidget:set_vertical(false)
-    -- else
-        -- batwidget:set_width(0)
-        -- batwidget:set_height(0)
-    -- end
--- end
--- batwidget:set_background_color('#000000')
--- batwidget:set_border_color(nil)
--- batwidget:set_color("#00bfff")
--- vicious.register(batwidget, vicious.widgets.bat, "$2", 60, "BAT0")
--- battest()
--- battimer = timer{timeout = 2}
--- battimer:connect_signal("timeout", function() battest() end)
--- battimer:start()
+char_width = nil
+text_color = theme.fg_normal or "#FFFFFF"
+today_color = theme.tasklist_fg_focus or "#FF7100"
+calendar_width = 21
+
+local calendar = nil
+local offset = 0
+
+local data = nil
+
+local function pop_spaces(s1, s2, maxsize)
+   local sps = ""
+   for i = 1, maxsize - string.len(s1) - string.len(s2) do
+      sps = sps .. " "
+   end
+   return s1 .. sps .. s2
+end
+
+local function create_calendar()
+   offset = offset or 0
+
+   local now = os.date("*t")
+   local cal_month = now.month + offset
+   local cal_year = now.year
+   if cal_month > 12 then
+      cal_month = (cal_month % 12)
+      cal_year = cal_year + 1
+   elseif cal_month < 1 then
+      cal_month = (cal_month + 12)
+      cal_year = cal_year - 1
+   end
+
+   local last_day = os.date("%d", os.time({ day = 1, year = cal_year,
+                                            month = cal_month + 1}) - 86400)
+   local first_day = os.time({ day = 1, month = cal_month, year = cal_year})
+   local first_day_in_week =
+      os.date("%w", first_day)
+   local result = "su mo tu we th fr sa\n"
+   for i = 1, first_day_in_week do
+      result = result .. "   "
+   end
+
+   local this_month = false
+   for day = 1, last_day do
+      local last_in_week = (day + first_day_in_week) % 7 == 0
+      local day_str = pop_spaces("", day, 2) .. (last_in_week and "" or " ")
+      if cal_month == now.month and cal_year == now.year and day == now.day then
+         this_month = true
+         result = result ..
+            string.format('<span weight="bold" foreground = "%s">%s</span>',
+                          today_color, day_str)
+      else
+         result = result .. day_str
+      end
+      if last_in_week and day ~= last_day then
+         result = result .. "\n"
+      end
+   end
+
+   local header
+   if this_month then
+      header = os.date("%a, %d %b %Y")
+   else
+      header = os.date("%B %Y", first_day)
+   end
+   return header, string.format('<span font="%s" foreground="%s">%s</span>',
+                                theme.font, text_color, result)
+end
+
+local function calculate_char_width()
+   return beautiful.get_font_height(theme.font) * 0.555
+end
+
+function hide()
+   if calendar ~= nil then
+      naughty.destroy(calendar)
+      calendar = nil
+      offset = 0
+   end
+end
+
+function show(inc_offset)
+   inc_offset = inc_offset or 0
+
+   local save_offset = offset
+   hide()
+   offset = save_offset + inc_offset
+
+   local char_width = char_width or calculate_char_width()
+   local header, cal_text = create_calendar()
+   calendar = naughty.notify({ title = header,
+                               text = cal_text,
+                               timeout = 0, hover_timeout = 0.5,
+                            })
+end
+
+function add_calendar(t_out)
+   hide()
+   local char_width = char_width or calculate_char_width()
+   local header, cal_text = create_calendar()
+   calendar = naughty.notify({ title = header,
+                               text = cal_text,
+                               timeout = t_out,
+                            })
+end
+-- }}}
 
 datewidget = wibox.widget.textbox()
 vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
+datewidget:connect_signal("mouse::enter", function() show(0) end)
+datewidget:connect_signal("mouse::leave", hide)
+datewidget:buttons(util.table.join( awful.button({ }, 1, function() show(-1) end),
+                                     awful.button({ }, 3, function() show(1) end)))
 
--- mytextclock = awful.widget.textclock()
+
 -- }}}
 
 -- Create a wibox for each screen and add it
@@ -285,7 +362,7 @@ for s = 1, screen.count() do
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
-    -- }}}
+-- }}}
 
     -- Create the wibox {{{
     mywibox[s] = awful.wibox({ position = "top", height = "15", screen = s })
@@ -294,21 +371,15 @@ for s = 1, screen.count() do
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
-    -- left_layout:add(cpuwidget)
     left_layout:add(myspacer)
     left_layout:add(mpdwidget)
     left_layout:add(myspacer)
-    -- left_layout:add(batwidget)
     left_layout:add(mypromptbox[s])
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(myspacer)
-    -- right_layout:add(batwidget)
-    -- right_layout:add(myspacer)
-    -- right_layout:add(ramwidget)
-    -- right_layout:add(myspacer)
     right_layout:add(datewidget)
     right_layout:add(myspacer)
     right_layout:add(volwidget)
@@ -316,11 +387,7 @@ for s = 1, screen.count() do
     right_layout:add(wifiwidget)
     right_layout:add(myspacer)
     right_layout:add(myspacer)
-    -- right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
-    --right_layout:add(smallcross)
-    --right_layout:add(mycross)
-    --right_layout:add(date)
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
@@ -349,13 +416,11 @@ globalkeys = awful.util.table.join(
 
     awful.key({ modkey,           }, "j",
         function ()
-            -- Change below to ...( 1) for original manner
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
     awful.key({ modkey,           }, "k",
         function ()
-            -- Change below to ...(-1) for original way
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
@@ -390,6 +455,9 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
+
+    -- Calendar pop-up
+    awful.key({ altkey,           }, "c",     function () add_calendar(5) end),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -426,25 +494,25 @@ clientkeys = awful.util.table.join(
     awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
     awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
     awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "tln") end),
-    -- Adding transparancy control
-    -- awful.key({ modkey }, "Next", function(c)
-        -- awful.util.spawn("transset-df --actual --dec 0.1") end),
-    -- awful.key({ modkey }, "Prior", function(c)
-        -- awful.util.spawn("transset-df --actual --inc 0.1") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
---
 -- Add ror to globalkeys
 globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
+
+-- Compute the maximum number of digit we need, limited to 9
+keynumber = 0
+for s = 1, screen.count() do
+   keynumber = math.min(9, math.max(#tags[s], keynumber));
+end
 
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
-for i = 1, 9 do
+for i = 1, keynumber do
     globalkeys = awful.util.table.join(globalkeys,
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
@@ -480,8 +548,8 @@ end
 
 
 clientbuttons = awful.util.table.join(
+    -- add the c:raise() in this function to allow raise on click
     awful.button({ }, 1, function (c) client.focus = c end), -- ; c:raise() end),
-    -- add the c:raise() in above function to allow raise on click
     awful.button({ modkey }, 1, awful.mouse.client.move),
     awful.button({ modkey }, 3, awful.mouse.client.resize))
 
@@ -515,16 +583,11 @@ awful.rules.rules = {
     -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
-    -- { rule = { name = "Figure 1" },
-      -- properties = { floating = true } },
   -- make feh floating
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
-    -- Rox - floating, titlebar added in manage signal (below)
-    -- { rule = { class = "ROX-Filer" },
-      -- properties = { floating = true } },
 }
 -- }}}
 
@@ -601,13 +664,5 @@ client.connect_signal("focus", function(c) c.border_color = beautiful.border_foc
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
-
--- Changes below are things I've added
--- Note: If you want to run a shell command, or a command using redirection
---      use     awful.util.spawn_with_shell("<command>")
-
-
--- Setting the font
--- awesome.font = 
 
 -- vim: set foldmethod=marker:
