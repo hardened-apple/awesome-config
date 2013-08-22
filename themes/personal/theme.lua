@@ -10,6 +10,7 @@ theme = {}
 home                  = os.getenv("HOME")
 config              = awful.util.getdir("config")
 wallpaperdir        = "~/.config/wallpapers"
+theme               = config .. "/themes"
 themedir            = config .. "/themes/personal"
 shared              = "/usr/share/awesome"
 sharedtheme         = "/usr/share/awesome/themes/default"
@@ -90,13 +91,8 @@ theme.titlebar_maximized_button_focus_active  = sharedtheme .. "/titlebar/maximi
 
 -- can use the default with sharedtheme .. "/background.png"
 theme.wallpaper = wallpaperdir .. "/arch_linux___kiss_by_abhinandh-d4exikc.png"
--- theme.wallpaper = themedir .. "/background.jpg"
--- theme.wallpaper = themedir .. "/bluebackground.jpg"
 
 -- You can use your own layout icons like this:
---theme.layout_fairh = sharedtheme .. "/layouts/fairhw.png"
---theme.layout_fairv = sharedtheme .. "/layouts/fairvw.png"
---theme.layout_fairv = "/home/matthew/awesome-themes/matrix/layouts/fairv.png"
 theme.layout_fairh = themedir .. "/layouts/smfairhw.png"
 theme.layout_fairv = themedir .. "/layouts/smfairvw.png"
 
