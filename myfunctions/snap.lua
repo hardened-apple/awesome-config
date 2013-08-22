@@ -26,9 +26,9 @@ function snap.snapwin(c, scr, pos)
         g.height = wa.height * 0.3
         g.x = 0
         g.y = wa.height*0.7 + offset
-    elseif pos == "tln" then
-        g.height = wa.height * 0.45
-        g.width = wa.width * 0.45
+    elseif pos == "trn" then
+        g.height = wa.height * 0.48
+        g.width = wa.width * 0.47
         g.x = wa.width * 0.99 - g.width
         g.y = wa.height * 0.01 + offset
     end
