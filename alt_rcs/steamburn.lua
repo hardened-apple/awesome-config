@@ -27,7 +27,7 @@ local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 -- }}}
 
--- {{{ Autostart applications 
+-- {{{ Autostart applications
 
 function run_once(cmd)
   findme = cmd
@@ -114,7 +114,7 @@ tags = {
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag( tags.names, s, tags.layout)
+    tags[s] = awful.tag(tags.names, s, tags.layout)
 end
 -- }}}
 
@@ -288,7 +288,7 @@ vicious.register(mygmail, vicious.widgets.gmail,
           notify_title = "You have 1 new message"
           notify_text = args["{subject}"]
       else
-          notify_title = "You have " .. noti .. " new messages"
+          notify_title = "You have " .. args["{count}"] .. " new messages"
           notify_text = 'On: "' .. args["{subject}"] .. '"'
       end
       naughty.notify({ title = notify_title, text = notify_text,
@@ -335,7 +335,7 @@ end, 1)
 
 -- MEM widget
 memwidget = wibox.widget.textbox()
-vicious.register(memwidget, vicious.widgets.mem, gray .. "Mem " .. coldef .. white .. "$2 " .. coldef, 13) -- in Megabytes
+vicious.register(memwidget, vicious.widgets.mem, gray .. "Mem " .. coldef .. white .. "$1 " .. coldef, 13) -- in Megabytes
 
 -- CPU widget
 cpuwidget = wibox.widget.textbox()
@@ -705,7 +705,7 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
     awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
     awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "tln") end),
+    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "trn") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
@@ -782,20 +782,12 @@ awful.rules.rules = {
                      size_hints_honor = false } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
-    -- Set Firefox to always map on tags number 9 of screen 1.
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][1], floating = true } },
-    -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
-    -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
-  -- make feh floating
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },

@@ -608,20 +608,12 @@ awful.rules.rules = {
                      size_hints_honor = false } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
-    -- Set Firefox to always map on tags number 9 of screen 1.
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
-    -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
-  -- make feh floating
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },

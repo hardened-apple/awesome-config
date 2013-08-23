@@ -3,7 +3,16 @@ Repo to hold my awesome window manager configuration.
 Run or Raise function taken from the awesome wiki
 (awesome.naquadah.org/wiki/Run_or_raise)
 The shifty and vicious folders are taken from
-https://github.com/cdump/awesome-shifty and git.sysphere.org/vicious/ (through the vicious arch package)
+https://github.com/cdump/awesome-shifty and
+git.sysphere.org/vicious/ (through the vicious arch package)
+respectively
 
 The tree, dust and muted-dream-tree themes are taken from
 https://github.com/mikar/awesome-themes
+
+The steamburn theme is taken from
+https://github.com/copycat-killer/awesome-copycats
+
+Some widgets are taken from
+https://github.com/copycat-killer/vain
+I've tried to remember to give credit in the source.

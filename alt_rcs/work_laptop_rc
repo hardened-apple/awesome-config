@@ -595,17 +595,10 @@ awful.rules.rules = {
                      size_hints_honor = false } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    { rule = { class = "gimp" },
-      properties = { floating = true } },
-    -- Set Firefox to always map on tags number 9 of screen 1.
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
-    -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } }, 
     { rule = { name = "Figure 1" },
@@ -614,7 +607,6 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
-    -- Rox - floating, titlebar added in manage signal (below)
     { rule = { class = "ROX-Filer" },
       properties = { floating = true } },
 }
@@ -694,4 +686,4 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 
--- vim: set foldmethod=marker:
+-- vim: set foldmethod=marker filetype=lua:
