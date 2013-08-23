@@ -8,7 +8,7 @@
 
 # The music directory that contains the music and cover files
 # Change according to your configuration
-MUSIC_DIR="$HOME/Musica"
+MUSIC_DIR="$HOME/share/torrents/done/music/"
 
 # The default cover to use (optional)
 DEFAULT_ART=""

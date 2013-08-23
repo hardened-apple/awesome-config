@@ -82,6 +82,7 @@ end
 -- }}}
 
 -- {{{ Tags
+
 tags = {
     -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
     names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
@@ -118,8 +119,7 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Widgets
 -- {{{ Define widgets
-myspacer = wibox.widget.textbox()
-myspacer:set_text(' ')
+myspacer = wibox.widget.textbox(' ')
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
@@ -441,6 +441,28 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
         end),
+
+    awful.key({ altkey,           }, "k",
+        function ()
+            awful.client.focus.bydirection("up")
+            if client.focus then client.focus:raise() end
+        end),
+    awful.key({ altkey,           }, "j",
+        function ()
+            awful.client.focus.bydirection("down")
+            if client.focus then client.focus:raise() end
+        end),
+    awful.key({ altkey,           }, "h",
+        function ()
+            awful.client.focus.bydirection("left")
+            if client.focus then client.focus:raise() end
+        end),
+    awful.key({ altkey,           }, "l",
+        function ()
+            awful.client.focus.bydirection("right")
+            if client.focus then client.focus:raise() end
+        end),
+
     awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
 
     -- Layout manipulation
