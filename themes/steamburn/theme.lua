@@ -8,10 +8,10 @@
 
 theme = {}
 
-themes_dir                                  = os.getenv("HOME") .. "/.config/awesome/themes/steamburn"
--- theme.wallpaper                             = themes_dir .. "/wall.png"
-wallpaperdir                                = "~/.config/wallpapers"
-theme.wallpaper                             = wallpaperdir .. "/steamburn.png"
+home                                        = os.getenv("HOME")
+themes_dir                                  = home .. "/.config/awesome/themes/steamburn"
+layoutdir                                   = home .. "/.config/awesome/themes/icons/outline_layouts"
+theme.wallpaper                             = themes_dir .. "/background.png"
 
 theme.font                                  = "Tamsyn 10"
 theme.fg_normal                             = "#cdcdcd"
@@ -43,10 +43,10 @@ theme.menu_submenu_icon                     = themes_dir .. "/icons/submenu.png"
 theme.taglist_squares_sel                   = themes_dir .. "/icons/square_sel.png"
 theme.taglist_squares_unsel                 = themes_dir .. "/icons/square_unsel.png"
 
-theme.layout_cascade                        = themes_dir .. "/icons/cascadew.png"
-theme.layout_cascadetile                    = themes_dir .. "/icons/cascadebrowsew.png"
-theme.layout_centerwork                     = themes_dir .. "/icons/centerworkw.png"
-theme.layout_termfair                       = themes_dir .. "/icons/termfairw.png"
+theme.layout_cascade                        = layoutdir .. "/cascadew.png"
+theme.layout_cascadetile                    = layoutdir .. "/cascadebrowsew.png"
+theme.layout_centerwork                     = layoutdir .. "/centerworkw.png"
+theme.layout_termfair                       = layoutdir .. "/termfairw.png"
 theme.layout_tile                           = themes_dir .. "/icons/tile.png"
 theme.layout_tilegaps                       = themes_dir .. "/icons/tilegaps.png"
 theme.layout_tileleft                       = themes_dir .. "/icons/tileleft.png"

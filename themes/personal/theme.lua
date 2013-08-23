@@ -8,12 +8,11 @@ theme = {}
 
 
 home                  = os.getenv("HOME")
-config              = awful.util.getdir("config")
-wallpaperdir        = "~/.config/wallpapers"
-theme               = config .. "/themes"
-themedir            = config .. "/themes/personal"
-shared              = "/usr/share/awesome"
-sharedtheme         = "/usr/share/awesome/themes/default"
+config                = awful.util.getdir("config")
+layoutdir             = config .. "/themes/icons/layouts_white"
+themedir              = config .. "/themes/personal"
+shared                = "/usr/share/awesome"
+sharedtheme           = "/usr/share/awesome/themes/default"
 
 
 -- Really haven't found the best font yet.
@@ -45,12 +44,7 @@ theme.border_marked = "#91231c"
 -- Example:
 --theme.taglist_bg_focus = "#ff0000"
 
--- Display the taglist squares
---theme.taglist_squares_sel   = sharedtheme .. "/taglist/squarefw.png"
---theme.taglist_squares_unsel = sharedtheme .. "/taglist/squarew.png"
-
--- Choose smaller squares for my taglist
-theme.taglist_squares_sel   = themedir .. "/taglist/smallsquarefw.png"
+theme.taglist_squares_sel     = themedir .. "/taglist/smallsquarefw.png"
 theme.taglist_squares_unsel   = themedir .. "/taglist/smallsquarew.png"
 
 -- Variables set for theming the menu:
@@ -66,48 +60,46 @@ theme.menu_width  = 120
 --theme.bg_widget = "#cc0000"
 
 -- Define the image to load
-theme.titlebar_close_button_normal = sharedtheme .. "/titlebar/close_normal.png"
-theme.titlebar_close_button_focus  = sharedtheme .. "/titlebar/close_focus.png"
+theme.titlebar_close_button_normal              = sharedtheme .. "/titlebar/close_normal.png"
+theme.titlebar_close_button_focus               = sharedtheme .. "/titlebar/close_focus.png"
 
-theme.titlebar_ontop_button_normal_inactive = sharedtheme .. "/titlebar/ontop_normal_inactive.png"
-theme.titlebar_ontop_button_focus_inactive  = sharedtheme .. "/titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_active = sharedtheme .. "/titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_active  = sharedtheme .. "/titlebar/ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_inactive     = sharedtheme .. "/titlebar/ontop_normal_inactive.png"
+theme.titlebar_ontop_button_focus_inactive      = sharedtheme .. "/titlebar/ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_active       = sharedtheme .. "/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_active        = sharedtheme .. "/titlebar/ontop_focus_active.png"
 
-theme.titlebar_sticky_button_normal_inactive = sharedtheme .. "/titlebar/sticky_normal_inactive.png"
-theme.titlebar_sticky_button_focus_inactive  = sharedtheme .. "/titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_active = sharedtheme .. "/titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_active  = sharedtheme .. "/titlebar/sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_inactive    = sharedtheme .. "/titlebar/sticky_normal_inactive.png"
+theme.titlebar_sticky_button_focus_inactive     = sharedtheme .. "/titlebar/sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_active      = sharedtheme .. "/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_active       = sharedtheme .. "/titlebar/sticky_focus_active.png"
 
-theme.titlebar_floating_button_normal_inactive = sharedtheme .. "/titlebar/floating_normal_inactive.png"
-theme.titlebar_floating_button_focus_inactive  = sharedtheme .. "/titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_active = sharedtheme .. "/titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_active  = sharedtheme .. "/titlebar/floating_focus_active.png"
+theme.titlebar_floating_button_normal_inactive  = sharedtheme .. "/titlebar/floating_normal_inactive.png"
+theme.titlebar_floating_button_focus_inactive   = sharedtheme .. "/titlebar/floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_active    = sharedtheme .. "/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_active     = sharedtheme .. "/titlebar/floating_focus_active.png"
 
 theme.titlebar_maximized_button_normal_inactive = sharedtheme .. "/titlebar/maximized_normal_inactive.png"
 theme.titlebar_maximized_button_focus_inactive  = sharedtheme .. "/titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_active = sharedtheme .. "/titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_active  = sharedtheme .. "/titlebar/maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active   = sharedtheme .. "/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_active    = sharedtheme .. "/titlebar/maximized_focus_active.png"
 
 -- can use the default with sharedtheme .. "/background.png"
-theme.wallpaper = wallpaperdir .. "/arch_linux___kiss_by_abhinandh-d4exikc.png"
+theme.wallpaper = themedir .. "/background.png"
 
 -- You can use your own layout icons like this:
-theme.layout_fairh = themedir .. "/layouts/smfairhw.png"
-theme.layout_fairv = themedir .. "/layouts/smfairvw.png"
-
-theme.layout_threep    = themedir .. "/layouts/tileleftw.png"
-theme.layout_floating  = themedir .. "/layouts/balloons.png"
---theme.layout_floating  = sharedtheme .. "/layouts/floatingw.png"
-theme.layout_magnifier = sharedtheme .. "/layouts/magnifierw.png"
-theme.layout_max = sharedtheme .. "/layouts/maxw.png"
-theme.layout_fullscreen = sharedtheme .. "/layouts/fullscreenw.png"
-theme.layout_tilebottom = sharedtheme .. "/layouts/tilebottomw.png"
-theme.layout_tileleft   = sharedtheme .. "/layouts/tileleftw.png"
-theme.layout_tile = sharedtheme .. "/layouts/tilew.png"
-theme.layout_tiletop = sharedtheme .. "/layouts/tiletopw.png"
-theme.layout_spiral  = sharedtheme .. "/layouts/spiralw.png"
-theme.layout_dwindle = sharedtheme .. "/layouts/dwindlew.png"
+theme.layout_fairh            = layoutdir .. "/fairhw.png"
+theme.layout_fairv            = layoutdir .. "/fairvw.png"
+-- theme.layout_threep           = themedir .. "/layouts_white/tileleftw.png"
+theme.layout_floating         = layoutdir .. "/floating_aw.png"
+theme.layout_magnifier        = layoutdir .. "/magnifierw.png"
+theme.layout_max              = layoutdir .. "/maxw.png"
+theme.layout_tilebottom       = layoutdir .. "/tilebottomw.png"
+theme.layout_tileleft         = layoutdir .. "/tileleftw.png"
+theme.layout_tile             = layoutdir .. "/tilew.png"
+theme.layout_tiletop          = layoutdir .. "/tiletopw.png"
+theme.layout_spiral           = layoutdir .. "/spiralw.png"
+theme.layout_dwindle          = layoutdir .. "/dwindlew.png"
+theme.layout_fullscreen       = sharedtheme .. "/layouts/fullscreenw.png"
 
 theme.awesome_icon = "/usr/share/awesome/icons/awesome16.png"
 
