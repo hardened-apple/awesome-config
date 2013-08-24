@@ -8,6 +8,7 @@ local tonumber  = tonumber
 local math      = math
 
 local centerwork = {}
+centerwork.name = "centerwork"
 
 top_left = 0
 top_right = 1

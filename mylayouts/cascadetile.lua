@@ -9,6 +9,7 @@ local tonumber  = tonumber
 local print     = print
 
 local cascadetile = {}
+cascadetile.name = "cascadetile"
 
 cascade_offset_x = 5
 cascade_offset_y = 32

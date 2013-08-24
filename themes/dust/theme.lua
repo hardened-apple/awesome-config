@@ -87,8 +87,8 @@ theme.layout_tiletop                            = layoutdir .. "/block_layouts/t
 theme.layout_spiral                             = layoutdir .. "/block_layouts/spiralw.png"
 theme.layout_dwindle                            = layoutdir .. "/block_layouts/dwindlew.png"
 theme.layout_cascade                            = layoutdir .. "/block_layouts/cascade.png"
-theme.layout_cascadebrowse                      = layoutdir .. "/block_layouts/cascadebrowse.png"
-theme.layout_canterwork                         = layoutdir .. "/block_layouts/canterwork.png"
+theme.layout_cascadetile                      = layoutdir .. "/block_layouts/cascadebrowsw.png"
+theme.layout_centerwork                         = layoutdir .. "/block_layouts/centerwork.png"
 theme.layout_termfair                           = layoutdir .. "/block_layouts/termfair.png"
 
 

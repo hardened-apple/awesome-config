@@ -7,4 +7,6 @@ return
     tilegaps        =  require("mylayouts.tilegaps");
     cascade         = require("mylayouts.cascade");
     cascadetile     = require("mylayouts.cascadetile");
+    termfair        = require("mylayouts.termfair");
+    centerwork      = require("mylayouts.centerwork");
 }

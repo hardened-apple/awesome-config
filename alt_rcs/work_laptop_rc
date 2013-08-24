@@ -158,23 +158,27 @@ function battest()
     local val = val_f:read("*line")
     val_f:close()
     if val == 'Discharging' then
-        batwidget:set_width(100)
-        batwidget:set_height(7)
-        batwidget:set_vertical(false)
+        return 'Unplugged'
     else
-        batwidget:set_width(0)
-        batwidget:set_height(0)
+        return 'Plugged'
     end
 end
 
+batwidget:set_width(100)
+batwidget:set_height(3)
+batwidget:set_vertical(false)
 batwidget:set_background_color('#000000')
 batwidget:set_border_color(nil)
 batwidget:set_color("#00bfff")
-vicious.register(batwidget, vicious.widgets.bat, "$2", 60, "BAT0")
-battest()
-battimer = timer{timeout = 2}
-battimer:connect_signal("timeout", function() battest() end)
-battimer:start()
+vicious.register(batwidget, vicious.widgets.bat,
+function (widget, args)
+    if (battest() == 'Unplugged') then
+        batwidget.visible = false
+    else
+        batwidget.visible = true
+    end
+    return args[2]
+end, 30, "BAT0")
 
 
 
@@ -470,12 +474,12 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
-    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
-    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
-    awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
-    awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
+    awful.key({ modkey,           }, "=",     function () awful.tag.incmwfact( 0.05)    end),
+    awful.key({ modkey,           }, "-",     function () awful.tag.incmwfact(-0.05)    end),
+    awful.key({ modkey, "Shift"   }, "-",     function () awful.tag.incnmaster( 1)      end),
+    awful.key({ modkey, "Shift"   }, "=",     function () awful.tag.incnmaster(-1)      end),
+    awful.key({ modkey, "Control" }, "-",     function () awful.tag.incncol( 1)         end),
+    awful.key({ modkey, "Control" }, "=",     function () awful.tag.incncol(-1)         end),
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 

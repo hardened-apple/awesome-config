@@ -6,6 +6,8 @@ local awful = require("awful")
 
 local cascade = {}
 
+cascade.name = "cascade"
+
 nmaster = 0
 cascade_offset_x = 32
 cascade_offset_y = 8
