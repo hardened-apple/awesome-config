@@ -17,7 +17,6 @@ local naughty         = require("naughty")
 local menubar         = require("menubar")
 -- }}}
 -- Extra {{{
-
 -- Define some paths
 configdir        = awful.util.getdir("config")
 scriptdir        = configdir .. "/scripts/"
@@ -26,18 +25,8 @@ local vicious    = require("vicious")
 local snap       = require("myfunctions.snap")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
--- }}}
-
--- {{{ Autostart applications
-
-function run_once(cmd)
-  findme = cmd
-  firstspace = cmd:find(" ")
-  if firstspace then
-     findme = cmd:sub(0, firstspace-1)
-  end
-  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
- end
+local gen        = require("myfunctions.general")
+require("myfunctions.cal")
 -- }}}
 
 -- {{{ Error Handling
@@ -166,124 +155,7 @@ clockicon = wibox.widget.imagebox()
 clockicon:set_image(beautiful.widget_clock)
 mytextclock = awful.widget.textclock("<span color='#7788af'>%A %d %B</span> " .. blue .. "</span><span color=\"#343639\">></span> <span color='#de5e1e'>%H:%M</span> ")
 
--- {{{ Calendar attached to the textclock
--- taken from copycat-killer/awesome-copycats
-local os = os
-local string = string
-local table = table
-local util = awful.util
-
-char_width = nil
-text_color = theme.fg_normal or "#FFFFFF"
-today_color = theme.fg_focus or "#00FF00"
-calendar_width = 21
-
-local calendar = nil
-local offset = 0
-
-local data = nil
-
-local function pop_spaces(s1, s2, maxsize)
-   local sps = ""
-   for i = 1, maxsize - string.len(s1) - string.len(s2) do
-      sps = sps .. " "
-   end
-   return s1 .. sps .. s2
-end
-
-local function create_calendar()
-   offset = offset or 0
-
-   local now = os.date("*t")
-   local cal_month = now.month + offset
-   local cal_year = now.year
-   if cal_month > 12 then
-      cal_month = (cal_month % 12)
-      cal_year = cal_year + 1
-   elseif cal_month < 1 then
-      cal_month = (cal_month + 12)
-      cal_year = cal_year - 1
-   end
-
-   local last_day = os.date("%d", os.time({ day = 1, year = cal_year,
-                                            month = cal_month + 1}) - 86400)
-   local first_day = os.time({ day = 1, month = cal_month, year = cal_year})
-   local first_day_in_week =
-      os.date("%w", first_day)
-   local result = "su mo tu we th fr sa\n"
-   for i = 1, first_day_in_week do
-      result = result .. "   "
-   end
-
-   local this_month = false
-   for day = 1, last_day do
-      local last_in_week = (day + first_day_in_week) % 7 == 0
-      local day_str = pop_spaces("", day, 2) .. (last_in_week and "" or " ")
-      if cal_month == now.month and cal_year == now.year and day == now.day then
-         this_month = true
-         result = result ..
-            string.format('<span weight="bold" foreground = "%s">%s</span>',
-                          today_color, day_str)
-      else
-         result = result .. day_str
-      end
-      if last_in_week and day ~= last_day then
-         result = result .. "\n"
-      end
-   end
-
-   local header
-   if this_month then
-      header = os.date("%a, %d %b %Y")
-   else
-      header = os.date("%B %Y", first_day)
-   end
-   return header, string.format('<span font="%s" foreground="%s">%s</span>',
-                                theme.font, text_color, result)
-end
-
-local function calculate_char_width()
-   return beautiful.get_font_height(theme.font) * 0.555
-end
-
-function hide()
-   if calendar ~= nil then
-      naughty.destroy(calendar)
-      calendar = nil
-      offset = 0
-   end
-end
-
-function show(inc_offset)
-   inc_offset = inc_offset or 0
-
-   local save_offset = offset
-   hide()
-   offset = save_offset + inc_offset
-
-   local char_width = char_width or calculate_char_width()
-   local header, cal_text = create_calendar()
-   calendar = naughty.notify({ title = header,
-                               text = cal_text,
-                               timeout = 0, hover_timeout = 0.5,
-                            })
-end
-
-function add_calendar(t_out)
-   hide()
-   local char_width = char_width or calculate_char_width()
-   local header, cal_text = create_calendar()
-   calendar = naughty.notify({ title = header,
-                               text = cal_text,
-                               timeout = t_out,
-                            })
-end
--- }}}
-
-mytextclock:connect_signal("mouse::enter", function() show(0) end)
-mytextclock:connect_signal("mouse::leave", hide)
-mytextclock:buttons(util.table.join( awful.button({ }, 1, function() show(-1) end),
-                                     awful.button({ }, 3, function() show(1) end)))
+cal.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
 
 -- Vicious weather widget
 weathericon = wibox.widget.imagebox()
@@ -308,7 +180,6 @@ vicious.register(mygmail, vicious.widgets.gmail,
                     gmail_t:add_to_object(mygmailimg)
                     return args["{count}"]
                  end, 60)
-mygmail:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn(mail, false) end)))
 
 -- MPD Widget
 mpdwidget = wibox.widget.textbox()
@@ -376,36 +247,10 @@ fshwidget = wibox.widget.textbox()
         end
     end, 620)
 
-local infos = nil
 
-function remove_info()
-    if infos ~= nil then
-        naughty.destroy(infos)
-        infos = nil
-    end
-end
-
-function add_info()
-    remove_info()
-    local capi = {
-        mouse = mouse,
-        screen = screen
-      }
-    local cal = awful.util.pread(scriptdir .. "dfs")
-    cal = string.gsub(cal, "          ^%s*(.-)%s*$", "%1")
-    infos = naughty.notify({
-        text = string.format('<span font_desc="%s">%s</span>', "Terminus", cal),
-        timeout = 0,
-        position = "top_right",
-        margin = 10,
-        height = 170,
-        width = 600,
-        screen  = capi.mouse.screen
-    })
-end
-
-fshwidget:connect_signal('mouse::enter', function () add_info() end)
-fshwidget:connect_signal('mouse::leave', function () remove_info() end)
+fshsize = {margin=10, height=170, width=600}
+fshwidget:connect_signal('mouse::enter', function () gen.add_info('Terminus', fshsize) end)
+fshwidget:connect_signal('mouse::leave', function () gen.remove_info() end)
 
 -- Battery widget
 baticon = wibox.widget.imagebox()
@@ -413,32 +258,14 @@ baticon:set_image(beautiful.widget_batt)
 batwidget = wibox.widget.textbox()
 vicious.register( batwidget, vicious.widgets.bat, "$2", 1, "BAT0")
 
-function batstate()
-
-  local file = io.open("/sys/class/power_supply/BAT0/status", "r")
-
-  if (file == nil) then
-    return "Cable plugged"
-  end
-
-  local batstate = file:read("*line")
-  file:close()
-
-  if (batstate == 'Discharging' or batstate == 'Charging') then
-    return batstate
-  else
-    return "Fully charged"
-  end
-end
-
 batwidget = wibox.widget.textbox()
 vicious.register(batwidget, vicious.widgets.bat,
 function (widget, args)
   -- plugged
-  if (batstate() == 'Cable plugged' or batstate() == 'Unknown') then
+  if (gen.batstate() == 'Cable plugged' or gen.batstate() == 'Unknown') then
     return "AC "
     -- critical
-  elseif (args[2] <= 5 and batstate() == 'Discharging') then
+  elseif (args[2] <= 5 and gen.batstate() == 'Discharging') then
     naughty.notify({
       text = "battery about to die...",
       title = "Urgent Battery State",
@@ -450,7 +277,7 @@ function (widget, args)
       ontop = true,
     })
     -- low
-  elseif (args[2] <= 10 and batstate() == 'Discharging') then
+  elseif (args[2] <= 10 and gen.batstate() == 'Discharging') then
     naughty.notify({
       text = "battery is low",
       title = "Battery Warning",
@@ -740,7 +567,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Calendar pop-up
-    awful.key({ altkey,           }, "c",     function () add_calendar(5) end),
+    awful.key({ altkey,           }, "c",     function () cal.show_calendar(5, 0) end),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
