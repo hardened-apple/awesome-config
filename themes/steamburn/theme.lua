@@ -13,6 +13,7 @@ themes_dir                                  = home .. "/.config/awesome/themes/s
 layoutdir                                   = home .. "/.config/awesome/themes/icons/outline_layouts"
 theme.wallpaper                             = themes_dir .. "/background.png"
 
+theme.name                                  = 'steamburn'
 theme.font                                  = "Tamsyn 10"
 theme.fg_normal                             = "#cdcdcd"
 theme.fg_focus                              = "#d79d38"

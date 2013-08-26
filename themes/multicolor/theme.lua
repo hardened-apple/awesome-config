@@ -9,6 +9,7 @@
 theme = {}
 theme.confdir = os.getenv("HOME") .. "/.config/awesome/themes/multicolor"
 
+theme.name = "multicolor"
 theme.font = "terminus 8"
 --theme.taglist_font =
 

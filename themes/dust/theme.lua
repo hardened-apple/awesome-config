@@ -18,6 +18,7 @@ themedir      = themes .. themename
 theme.wallpaper = themedir .. "/background.jpg"
 --}}}
 
+theme.name          = "dust"
 theme.font          = "clean 8"
 
 theme.bg_normal     = "#22222200"

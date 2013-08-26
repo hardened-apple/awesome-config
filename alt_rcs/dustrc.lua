@@ -14,11 +14,9 @@ configdir        = awful.util.getdir("config")
 scriptdir        = configdir .. "/scripts/"
 local ror        = require("myfunctions.aweror")
 local vicious    = require("vicious")
-local snap       = require("myfunctions.snap")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
-require("myfunctions.cal")
 -- }}}
 
 -- {{{ Error Handling
@@ -51,6 +49,7 @@ end
 -- Themes define colours, icons, and wallpapers
 beautiful.init(configdir .. "/themes/dust/theme.lua")
 
+mywiboxhgt = 15
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xterm"
@@ -124,61 +123,24 @@ myspacer:set_text(' ')
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
-vicious.register(wifiwidget, vicious.widgets.wifi,
-    function(widget, args)
-        if args["{sign}"] == 0 then
-            return "✗"
-        else
-            return "✓"
-        end
-    end, 10, "wlp5s0")
+vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, "wlp5s0")
 
 -- volume widget
 volwidget = wibox.widget.textbox()
-vicious.register(volwidget, vicious.widgets.volume,
-    function(widget, args)
-        return ' ' .. args[2] .. ':' .. args[1] .. ' '
-    end, 1, "Master")
+vicious.register(volwidget, vicious.widgets.volume, gen.volnorm, 1, "Master")
 
 -- mpd widget, what song is playing
 mpdwidget = wibox.widget.textbox()
-vicious.register(mpdwidget, vicious.widgets.mpd,
-    function (mpdwidget, args)
-        if args["{state}"] == "Stop" then
-            return "  "
-        else
-            return ' ' .. args["{Title}"] .. ' '
-        end
-    end, 1)
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdnorm, 1)
 
-
+-- battery widget
 batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat,
-function(widget, args)
-    -- plugged
-    if (gen.batstate() ~= "Discharging") then
-        return ''
-    elseif (args[2] <=10) then
-        naughty.notify{
-            text = 'battery is very low',
-            title = 'Warning',
-            position = 'top_right',
-            timeout = 0,
-            fg='#000000',
-            bg='#ff0000',
-            screen = 1,
-            ontop = true,
-        }
-    end
-    return args[2]
-end, 60, 'BAT0')
+vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 60, 'BAT0')
 
-
-
-
+-- textclock
 datewidget = wibox.widget.textbox()
 vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
-cal.attach_calendar(datewidget, beautiful.bg_normal, beautiful.fg_normal)
+gen.attach_calendar(datewidget, beautiful.bg_normal, beautiful.fg_normal)
 
 -- }}}
 
@@ -250,7 +212,7 @@ for s = 1, screen.count() do
 -- }}}
 
     -- Create the wibox {{{
-    mywibox[s] = awful.wibox({ position = "top", height = "15", screen = s })
+    mywibox[s] = awful.wibox({ position = "top", height = mywiboxhgt, screen = s })
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
@@ -366,7 +328,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Calendar pop-up
-    awful.key({ altkey,           }, "c",     function () cal.show_calendar(5, 0) end),
+    awful.key({ altkey,           }, "c",     function () gen.show_calendar(5, 0) end),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -396,13 +358,13 @@ clientkeys = awful.util.table.join(
             c.minimized = true
         end),
     -- Adding snap-to keybindings
-    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[c.screen], "tl") end),
-    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[c.screen], "tr") end),
-    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[c.screen], "bl") end),
-    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
-    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
-    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "trn") end),
+    awful.key({modkey}, "q", function(c) gen.snap(c, screen[c.screen], "tl", mywiboxhgt) end),
+    awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr", mywiboxhgt) end),
+    awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
+    awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal", mywiboxhgt) end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal

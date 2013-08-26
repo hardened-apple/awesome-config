@@ -19,6 +19,7 @@ theme.wallpaper    = themedir .. "/background.png"
 --}}}
 
 theme.font          = "terminus 8"
+theme.name          = "muted"
 
 theme.useless_gap_width  = "3"
 

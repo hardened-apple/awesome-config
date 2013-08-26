@@ -22,11 +22,9 @@ configdir        = awful.util.getdir("config")
 scriptdir        = configdir .. "/scripts/"
 local ror        = require("myfunctions.aweror")
 local vicious    = require("vicious")
-local snap       = require("myfunctions.snap")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
-require("myfunctions.cal")
 -- }}}
 
 -- {{{ Error Handling
@@ -59,6 +57,7 @@ end
 -- Themes define colours, icons, and wallpapers
 beautiful.init(configdir .. "/themes/steamburn/theme.lua")
 
+mywiboxhgt = 18
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xterm"
@@ -145,65 +144,44 @@ gray = "<span color='#94928f'>"
 
 -- Textclock widget
 mytextclock = awful.widget.textclock(white .. "%H:%M"  .. coldef)
-cal.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
+gen.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
 
 -- Mail widget
 mygmail = wibox.widget.textbox()
 notify_shown = false
-vicious.register(mygmail, vicious.widgets.gmail,
- function (widget, args)
-  notify_title = "You have a new message."
-  notify_text = '"' .. args["{subject}"] .. '"'
-  if (args["{count}"] > 0 ) then
-    if (notify_shown == false) then
-      if (args["{count}"] == 1) then
-          notify_title = "You have 1 new message"
-          notify_text = args["{subject}"]
-      else
-          notify_title = "You have " .. args["{count}"] .. " new messages"
-          notify_text = 'On: "' .. args["{subject}"] .. '"'
-      end
-      naughty.notify({ title = notify_title, text = notify_text,
-      timeout = 7,
-      position = "top_left",
-      icon = beautiful.widget_mail_notify,
-      fg = beautiful.fg_urgent,
-      bg = beautiful.bg_urgent })
-      notify_shown = true
-    end
-    return gray .. " Mail " .. coldef .. white .. args["{count}"] .. " " .. coldef
-  else
-    notify_shown = false
-    return ''
-  end
-end, 60)
+vicious.register(mygmail, vicious.widgets.gmail, gen.mailsteam, 60)
+-- vicious.register(mygmail, vicious.widgets.gmail,
+ -- function (widget, args)
+  -- notify_title = "You have a new message."
+  -- notify_text = '"' .. args["{subject}"] .. '"'
+  -- if (args["{count}"] > 0 ) then
+    -- if (notify_shown == false) then
+      -- if (args["{count}"] == 1) then
+          -- notify_title = "You have 1 new message"
+          -- notify_text = args["{subject}"]
+      -- else
+          -- notify_title = "You have " .. args["{count}"] .. " new messages"
+          -- notify_text = 'On: "' .. args["{subject}"] .. '"'
+      -- end
+      -- naughty.notify({ title = notify_title, text = notify_text,
+      -- timeout = 7,
+      -- position = "top_left",
+      -- icon = beautiful.widget_mail_notify,
+      -- fg = beautiful.fg_urgent,
+      -- bg = beautiful.bg_urgent })
+      -- notify_shown = true
+    -- end
+    -- return gray .. " Mail " .. coldef .. white .. args["{count}"] .. " " .. coldef
+  -- else
+    -- notify_shown = false
+    -- return ''
+  -- end
+-- end, 60)
 
 -- Mpd widget
 mpdwidget = wibox.widget.textbox()
 mpdwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn_with_shell(musicplr) end)))
-curr_track = nil
-vicious.register(mpdwidget, vicious.widgets.mpd,
-function(widget, args)
-    if (args["{state}"] == "Play") then
-    if( args["{Title}"] ~= curr_track )
-    then
-        curr_track = args["{Title}"]
-        os.execute(scriptdir .. "mpdinfo")
-        old_id = naughty.notify({
-            title = "Now playing",
-            text = args["{Artist}"] .. " (" .. args["{Album}"] .. ")\n" .. args["{Title}"],
-            icon = "/tmp/mpdnotify_cover.png",
-            timeout = 5,
-            replaces_id = old_id
-        }).id
-    end
-        return gray .. args["{Title}"] .. coldef .. white .. " " .. args["{Artist}"] .. coldef
-    elseif (args["{state}"] == "Pause") then
-        return gray .. "mpd " .. coldef .. white .. "paused" .. coldef
-    else
-        return ""
-    end
-end, 1)
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdsteam, 1)
 
 -- MEM widget
 memwidget = wibox.widget.textbox()
@@ -219,67 +197,19 @@ vicious.register(tempwidget, vicious.widgets.thermal, gray .. "Temp " .. coldef 
 
 -- /home fs widget
 fshwidget = wibox.widget.textbox()
-vicious.register(fshwidget, vicious.widgets.fs,
-function (widget, args)
-  if ( args["{/home/apple/share used_p}"] >= 99 ) then
-    naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
-    timeout = 10,
-    position = "top_right",
-    fg = beautiful.fg_urgent,
-    bg = beautiful.bg_urgent })
-  end
-  return gray .. "Hdd " .. coldef .. white .. args["{/home/apple/share used_p}"] .. coldef
-end, 600)
+vicious.register(fshwidget, vicious.widgets.fs, gen.fssteam, 600)
 
-fshsize = {margin=10, height=210, width=700}
-fshwidget:connect_signal('mouse::enter', function () gen.add_info('Tamsyn', fshsize) end)
-fshwidget:connect_signal('mouse::leave', function () gen.remove_info() end)
+fshsize = {margin=10, height=180, width=700}
+fshwidget:connect_signal('mouse::enter', function () gen.showfs('Tamsyn', fshsize) end)
+fshwidget:connect_signal('mouse::leave', function () gen.removefs() end)
 
 -- Battery widget
 batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat,
-function (widget, args)
-  -- plugged
-  if (gen.batstate() == 'Cable plugged' or gen.batstate() == 'Unknown') then
-    return ''
-    -- critical
-  elseif (args[2] <= 5 and gen.batstate() == 'Discharging') then
-    naughty.notify({
-      text = "battery about to die...",
-      title = "Urgent Battery State",
-      position = "top_right",
-      timeout = 1,
-      fg="#000000",
-      bg="#ffffff",
-      screen = 1,
-      ontop = true,
-    })
-    -- low
-  elseif (args[2] <= 10 and gen.batstate() == 'Discharging') then
-    naughty.notify({
-      text = "battery is low",
-      title = "Battery Warning",
-      position = "top_right",
-      timeout = 1,
-      fg="#ffffff",
-      bg="#262729",
-      screen = 1,
-      ontop = true,
-    })
-  end
-  return gray .. "Bat " .. coldef .. white .. args[2] .. " " .. coldef
-end, 1, 'BAT0')
+vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 1, 'BAT0')
 
 -- Volume widget
 volumewidget = wibox.widget.textbox()
-vicious.register(volumewidget, vicious.widgets.volume,
-function (widget, args)
-  if (args[2] ~= "♩" ) then
-     return gray .. "Vol " .. coldef .. white .. args[1] .. " " .. coldef
-  else
-     return gray .. "Vol " .. coldef .. white .. "mute " .. coldef
-  end
-end, 1, "Master")
+vicious.register(volumewidget, vicious.widgets.volume, gen.volsteam, 1, "Master")
 
 -- Net widget
 netwidget = wibox.widget.textbox()
@@ -289,12 +219,11 @@ netwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.u
 
 -- }}}
 
--- Create a wibox for each screen and add it
+-- {{{Define a wibox for each screen
 mywibox = {}
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
--- Buttons {{{
 mytaglist.buttons = awful.util.table.join(
                     awful.button({ }, 1, awful.tag.viewonly),
                     awful.button({ modkey }, 1, awful.client.movetotag),
@@ -337,7 +266,9 @@ mytasklist.buttons = awful.util.table.join(
                                               awful.client.focus.byidx(-1)
                                               if client.focus then client.focus:raise() end
                                           end))
+-- }}}
 
+-- Create and add {{{
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
@@ -354,10 +285,8 @@ for s = 1, screen.count() do
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
--- }}}
 
-    -- Create the wibox {{{
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 18 })
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt })
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
@@ -496,7 +425,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Calendar pop-up
-    awful.key({ altkey,           }, "c",     function () cal.show_calendar(5, 0) end),
+    awful.key({ altkey,           }, "c",     function () gen.show_calendar(5, 0) end),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -526,13 +455,13 @@ clientkeys = awful.util.table.join(
             c.minimized = true
         end),
     -- Adding snap-to keybindings
-    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[c.screen], "tl") end),
-    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[c.screen], "tr") end),
-    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[c.screen], "bl") end),
-    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
-    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
-    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "trn") end),
+    awful.key({modkey}, "q", function(c) gen.snap(c, screen[c.screen], "tl", mywiboxhgt) end),
+    awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr", mywiboxhgt) end),
+    awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
+    awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal", mywiboxhgt) end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal

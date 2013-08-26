@@ -15,7 +15,7 @@ shared                = "/usr/share/awesome"
 sharedtheme           = "/usr/share/awesome/themes/default"
 
 
--- Really haven't found the best font yet.
+theme.name          = "personal"
 theme.font          = "terminus 8"
 
 theme.bg_normal     = "#222222"

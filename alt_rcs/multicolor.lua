@@ -22,11 +22,9 @@ configdir        = awful.util.getdir("config")
 scriptdir        = configdir .. "/scripts/"
 local ror        = require("myfunctions.aweror")
 local vicious    = require("vicious")
-local snap       = require("myfunctions.snap")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
-require("myfunctions.cal")
 -- }}}
 
 -- {{{ Error Handling
@@ -58,6 +56,8 @@ end
 -- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
 beautiful.init(configdir .. "/themes/multicolor/theme.lua")
+
+mywiboxhgt = 20
 
 terminal = "xterm"
 editor = os.getenv("EDITOR") or "vim"
@@ -155,7 +155,7 @@ clockicon = wibox.widget.imagebox()
 clockicon:set_image(beautiful.widget_clock)
 mytextclock = awful.widget.textclock("<span color='#7788af'>%A %d %B</span> " .. blue .. "</span><span color=\"#343639\">></span> <span color='#de5e1e'>%H:%M</span> ")
 
-cal.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
+gen.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
 
 -- Vicious weather widget
 weathericon = wibox.widget.imagebox()
@@ -186,23 +186,7 @@ mpdwidget = wibox.widget.textbox()
 mpdicon = wibox.widget.imagebox()
 mpdicon:set_image(theme.confdir .. "/widgets/note.png")
 
-vicious.register(mpdwidget, vicious.widgets.mpd,
-function(widget, args)
-    -- play
-    if (args["{state}"] == "Play") then
-        return red .. args["{Title}"] .. coldef .. colwhi .. " - " .. coldef .. colwhi  .. 
-        args["{Artist}"] .. coldef
-    -- pause
-    elseif (args["{state}"] == "Pause") then
-        return red .. "mpd</span>" .. colwhi .." paused</span>"
-    -- stop
-    elseif (args["{state}"] == "Stop") then
-        return red .. "mpd</span>" .. colwhi .." stopped</span>"
-    -- not running
-    else
-        return red .. "mpd</span>" .. colwhi .." off</span>"
-    end
-    end, 1)
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdcol, 1)
 
 
 -- Uptime
@@ -231,26 +215,12 @@ tempicon:buttons(awful.util.table.join(
 fshicon = wibox.widget.imagebox()
 fshicon:set_image(theme.confdir .. "/widgets/fs.png")
 fshwidget = wibox.widget.textbox()
-    vicious.register(fshwidget, vicious.widgets.fs,
-    function (widget, args)
-        if args["{/home/apple/share used_p}"] >= 95 and args["{/home/apple/share used_p}"] < 99 then
-            return colwhi .. args["{/home/apple/share used_p}"] .. "%" .. coldef
-        elseif args["{/home/apple/share used_p}"] >= 99 and args["{/home/apple/share used_p}"] <= 100 then
-            naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
-                             timeout = 10,
-                             position = "top_right",
-                             fg = beautiful.fg_urgent,
-                             bg = beautiful.bg_urgent })
-            return colwhi .. args["{/home/apple/share used_p}"] .. "%" .. coldef
-        else
-            return azure .. args["{/home/apple/share used_p}"] .. "%" .. coldef
-        end
-    end, 620)
+vicious.register(fshwidget, vicious.widgets.fs, gen.fscol, 620)
 
 
 fshsize = {margin=10, height=170, width=600}
-fshwidget:connect_signal('mouse::enter', function () gen.add_info('Terminus', fshsize) end)
-fshwidget:connect_signal('mouse::leave', function () gen.remove_info() end)
+fshwidget:connect_signal('mouse::enter', function () gen.showfs('Terminus', fshsize) end)
+fshwidget:connect_signal('mouse::leave', function () gen.removefs() end)
 
 -- Battery widget
 baticon = wibox.widget.imagebox()
@@ -259,38 +229,7 @@ batwidget = wibox.widget.textbox()
 vicious.register( batwidget, vicious.widgets.bat, "$2", 1, "BAT0")
 
 batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat,
-function (widget, args)
-  -- plugged
-  if (gen.batstate() == 'Cable plugged' or gen.batstate() == 'Unknown') then
-    return "AC "
-    -- critical
-  elseif (args[2] <= 5 and gen.batstate() == 'Discharging') then
-    naughty.notify({
-      text = "battery about to die...",
-      title = "Urgent Battery State",
-      position = "top_right",
-      timeout = 1,
-      fg="#000000",
-      bg="#ffffff",
-      screen = 1,
-      ontop = true,
-    })
-    -- low
-  elseif (args[2] <= 10 and gen.batstate() == 'Discharging') then
-    naughty.notify({
-      text = "battery is low",
-      title = "Battery Warning",
-      position = "top_right",
-      timeout = 1,
-      fg="#ffffff",
-      bg="#262729",
-      screen = 1,
-      ontop = true,
-    })
-  end
-    return " " .. args[2] .. "% "
-end, 1, 'BAT0')
+vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 1, 'BAT0')
 
 -- Volume widget
 volicon = wibox.widget.imagebox()
@@ -388,7 +327,7 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the upper wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 20 }) 
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt }) 
     --border_width = 0, height =  20 })
         
     -- Widgets that are aligned to the upper left
@@ -452,7 +391,7 @@ for s = 1, screen.count() do
     mywibox[s]:set_widget(layout)
 
     -- Create the bottom wibox
-    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 20 })
+    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = mywiboxhgt })
     --mybottomwibox[s].visible = false
             
     -- Widgets that are aligned to the bottom left
@@ -567,7 +506,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Calendar pop-up
-    awful.key({ altkey,           }, "c",     function () cal.show_calendar(5, 0) end),
+    awful.key({ altkey,           }, "c",     function () gen.show_calendar(5, 0) end),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -597,13 +536,13 @@ clientkeys = awful.util.table.join(
             c.minimized = true
         end),
     -- Adding snap-to keybindings
-    awful.key({modkey}, "q", function(c) snap.snapwin(c, screen[c.screen], "tl") end),
-    awful.key({modkey}, "e", function(c) snap.snapwin(c, screen[c.screen], "tr") end),
-    awful.key({modkey}, "z", function(c) snap.snapwin(c, screen[c.screen], "bl") end),
-    awful.key({modkey}, "c", function(c) snap.snapwin(c, screen[c.screen], "br") end),
-    awful.key({modkey, "Control"}, "c", function(c) snap.snapwin(c, screen[c.screen], "brs") end),
-    awful.key({modkey, "Control"}, "x", function(c) snap.snapwin(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) snap.snapwin(c, screen[c.screen], "trn") end),
+    awful.key({modkey}, "q", function(c) gen.snap(c, screen[c.screen], "tl", mywiboxhgt) end),
+    awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr", mywiboxhgt) end),
+    awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
+    awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal", mywiboxhgt) end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
