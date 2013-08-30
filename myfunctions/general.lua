@@ -356,9 +356,9 @@ end
 -- {{{ Position definitions
 -- To change the defined positions, just modify these three tables.
 -- All values are in percentage of workarea, borders are from edge of monitor
-local abstract_borders = {top=0.006, side=0.004}
+local abstract_borders = {top=0.008, side=0.006}
 
-local abstract_sizes = {small={0.35, 0.5}, normal={0.43, 0.44}, long={0.3, 0.992}}
+local abstract_sizes = {small={0.35, 0.5}, normal={0.43, 0.44}, long={0.3, 0.987}}
 
 local abstract_positions = {tl=function(g) return {borders['top'], borders['left']} end,
                             tr=function(g) return {borders['top'], borders['right'] - g.width} end,
@@ -411,12 +411,13 @@ end
 function rettab.resize(c, scr, size, wiboxhgt)
     local cgeom = c:geometry()
     local wa = scr.workarea
+    local scrgeom = scr.geometry
     local newgeom = create_actual_sizes(wa, size)
     newgeom.x, newgeom.y = cgeom.x, cgeom.y
     local borders = find_borders_in_pixels(wa)
-    if cgeom.x + newgeom.width > borders.right  or cgeom.y + newgeom.height > borders.bottom then
-        newgeom.x = newgeom.x - math.max(cgeom.x + newgeom.width - borders.right, 0)
-        newgeom.y = newgeom.y - math.max(cgeom.y + newgeom.height - borders.bottom, 0)
+    if cgeom.x + newgeom.width > borders.right + scrgeom.x  or cgeom.x + newgeom.height > borders.bottom + scrgeom.y then
+        newgeom.x = newgeom.x - math.max(cgeom.x + newgeom.width - borders.right - scrgeom.x, 0)
+        newgeom.y = newgeom.y - math.max(cgeom.y + newgeom.height - borders.bottom - scrgeom.y, 0)
     end
     c:geometry(newgeom)
 end

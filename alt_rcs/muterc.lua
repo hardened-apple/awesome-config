@@ -264,7 +264,8 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 
--- {{{ Key bindings
+-- {{{ Keys
+-- {{{ Globalkeys
 globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
@@ -350,7 +351,10 @@ globalkeys = awful.util.table.join(
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
-
+-- Add ror to globalkeys
+globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
+--}}}
+--{{{ Clientkeys
 clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
@@ -378,9 +382,8 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
--- Add ror to globalkeys
-globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
-
+-- }}}
+-- {{{ Tag motions
 -- Compute the maximum number of digit we need, limited to 9
 keynumber = 0
 for s = 1, screen.count() do
@@ -423,8 +426,8 @@ for i = 1, keynumber do
                       end
                   end))
 end
-
-
+-- }}}
+-- {{{ set rootkeys, define client buttons
 clientbuttons = awful.util.table.join(
     -- add the c:raise() in this function to allow raise on click
     awful.button({ }, 1, function (c) client.focus = c end), -- ; c:raise() end),
@@ -433,6 +436,7 @@ clientbuttons = awful.util.table.join(
 
 -- Set keys
 root.keys(globalkeys)
+-- }}}
 -- }}}
 
 -- {{{ Rules

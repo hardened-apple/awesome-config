@@ -393,6 +393,7 @@ for s = 1, screen.count() do
     mywibox[s]:set_widget(layout)
 end
 -- }}}
+-- }}}
 
 -- SHIFTY: initialize shifty {{{
 -- the assignment of shifty.taglist must always be after its actually
@@ -410,6 +411,7 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings (inc. shifty bindings)
+-- {{{ GlobalKeys
 globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
@@ -514,7 +516,10 @@ globalkeys = awful.util.table.join(
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
-
+-- Add ror to globalkeys
+globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
+--}}}
+--{{{ Clientkeys
 clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
@@ -537,14 +542,14 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
--- Add ror to globalkeys
-globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
--- SHIFTY: assign client keys to shifty for use in {{{
+--}}}
+-- SHIFTY: assign client keys to shifty for use in
 -- match() function(manage hook)
 shifty.config.clientkeys = clientkeys
 shifty.config.modkey = modkey
+--}}}
 
--- Bind all key numbers to tags.
+-- Bind all key numbers to tags. {{{
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, (shifty.config.maxtags or 9) do
@@ -575,7 +580,9 @@ end
 
 -- Set keys
 root.keys(globalkeys)
--- }}}
+--}}}
+
+--Signals {{{
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)

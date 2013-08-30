@@ -179,7 +179,7 @@ vicious.register(mygmail, vicious.widgets.gmail,
                     gmail_t:set_text(args["{subject}"])
                     gmail_t:add_to_object(mygmailimg)
                     return args["{count}"]
-                 end, 60)
+                 end, 120)
 
 -- MPD Widget
 mpdwidget = wibox.widget.textbox()
@@ -422,7 +422,8 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 
--- {{{ Key bindings
+-- {{{ Keys
+-- {{{ Globalkeys
 globalkeys = awful.util.table.join(
 
     -- Move clients
@@ -521,7 +522,10 @@ globalkeys = awful.util.table.join(
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
-
+-- Add ror to globalkeys
+globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
+--}}}
+--{{{ Clientkeys
 clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
@@ -549,9 +553,8 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
--- Add ror to globalkeys
-globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
-
+-- }}}
+-- {{{ Tag motions
 -- Compute the maximum number of digit we need, limited to 9
 keynumber = 0
 for s = 1, screen.count() do
@@ -594,8 +597,8 @@ for i = 1, keynumber do
                       end
                   end))
 end
-
-
+-- }}}
+-- {{{ set rootkeys, define client buttons
 clientbuttons = awful.util.table.join(
     -- add the c:raise() in this function to allow raise on click
     awful.button({ }, 1, function (c) client.focus = c end), -- ; c:raise() end),
@@ -604,6 +607,7 @@ clientbuttons = awful.util.table.join(
 
 -- Set keys
 root.keys(globalkeys)
+-- }}}
 -- }}}
 
 -- {{{ Rules
