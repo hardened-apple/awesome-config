@@ -11,6 +11,8 @@ rettab = {}
 coldef  = "</span>"
 colwhi  = "<span color='#b2b2b2'>"
 white  = "<span color='#cdcdcd'>"
+holowhite = "<span color='#FFFFFF'>"
+blue = "<span color='#80CCE6'>"
 gray = "<span color='#94928f'>"
 red = "<span color='#e54c62'>"
 azure = "<span color='#80d9d8'>"
@@ -33,6 +35,30 @@ function rettab.wifinorm(widget, args)
         return "✗"
     else
         return "✓"
+    end
+end
+
+function rettab.wifiholo(widget, args)
+    if args["{wlp5s0 carrier}"] == 0 then
+       if no_net_shown == true then
+         naughty.notify({ title = "wlp5s0", text = "No carrier",
+         timeout = 7,
+         position = "top_left",
+         icon = beautiful.widget_no_net_notify,
+         fg = "#FF1919",
+         bg = beautiful.bg_normal })
+         no_net_shown = false
+         netdown_icon:set_image()
+         netup_icon:set_image()
+       end
+       return holowhite .. "<span font='Tamsyn 2'> </span>Net " .. coldef .. "<span color='#FF4040'>Off<span font='Tamsyn 5'> </span>"  .. coldef
+    else
+       if no_net_shown ~= true then
+         netdown_icon:set_image(beautiful.net_down)
+         netup_icon:set_image(beautiful.net_up)
+         no_net_shown = true
+       end
+       return holowhite .. "<span font='Tamsyn 2'> </span>" .. args["{wlp5s0 down_kb}"] .. " - " .. args["{wlp5s0 up_kb}"] .. "<span font='Tamsyn 2'> </span>" .. coldef
     end
 end
 -- }}}
@@ -66,7 +92,11 @@ end
 function rettab.batnorm(widget, args)
     -- plugged
   if (rettab.batstate() == 'Cable plugged' or rettab.batstate() == 'Fully charged') then
-    return 'AC'
+    if beautiful.name == 'holo' then
+        return ''
+    else
+        return 'AC'
+    end
     -- critical
   elseif (args[2] <= 5 and rettab.batstate() == 'Discharging') then
     naughty.notify({
@@ -94,6 +124,8 @@ function rettab.batnorm(widget, args)
   end
   if beautiful.name == 'steamburn' then
     return gray .. "Bat " .. coldef .. white .. args[2] .. " " .. coldef
+elseif beautiful.name == 'holo' then
+    return blue .. "Bat " .. coldef .. holowhite .. args[2] .. " " .. coldef
   end
   return args[2] .. "%"
 end
@@ -112,15 +144,16 @@ end
 -- This function calls the global 'scriptdir' that must be defined in any rc
 -- that calls it.
 function rettab.showfs(font, size)
+    local font = beautiful.font or font
     rettab.removefs()
     local capi = {
         mouse = mouse,
         screen = screen
       }
-    local cal = awful.util.pread(scriptdir .. "dfs")
-    cal = string.gsub(cal, "          ^%s*(.-)%s*$", "%1")
+    local hdd = awful.util.pread(scriptdir .. "dfs")
+    hdd = string.gsub(hdd, "          ^%s*(.-)%s*$", "%1")
     infos = naughty.notify({
-        text = string.format('<span font_desc="%s">%s</span>', font, cal),
+        text = string.format('<span font_desc="%s">%s</span>', font, hdd),
         timeout = 0,
         position = "top_right",
         margin = size.margin or 10,
@@ -129,7 +162,6 @@ function rettab.showfs(font, size)
         screen  = capi.mouse.screen
     })
 end
-
 
 function rettab.fssteam(widget, args)
   if ( args["{/home/apple/share used_p}"] >= 99 ) then
@@ -143,8 +175,25 @@ function rettab.fssteam(widget, args)
 end
 
 
+function rettab.fsholo(widget, args)
+  if ( args["{/home/apple/share used_p}"] >= 90 ) then
+      if ( args["{/home/apple/share used_p}"] >= 99 and too_much == false ) then
+        naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
+        timeout = 7,
+        position = "top_right",
+        fg = beautiful.fg_urgent,
+        bg = beautiful.bg_urgent })
+        too_much = true
+      end
+      return holowhite .. " Hdd " .. coldef .. blue .. args["{/home/apple/share used_p}"] .. coldef .. " "
+  else
+    return ""
+  end
+end
+
+
 function rettab.fscol(widget, args)
-    if args["{/home/apple/share used_p}"] >= 95 and args["{/home/apple/share used_p}"] < 99 then
+    if args["{/home/apple/share used_p}"] >= 90 and args["{/home/apple/share used_p}"] < 99 then
         return colwhi .. args["{/home/apple/share used_p}"] .. "%" .. coldef
     elseif args["{/home/apple/share used_p}"] >= 99 then
         naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
@@ -181,6 +230,8 @@ function rettab.mpdsteam(widget, args)
             title = "Now playing",
             text = args["{Artist}"] .. " (" .. args["{Album}"] .. ")\n" .. args["{Title}"],
             icon = "/tmp/mpdnotify_cover.png",
+            fg = beautiful.fg_normal,
+            bg = beautiful.bg_normal,
             timeout = 5,
             replaces_id = old_id
         }).id
@@ -190,6 +241,37 @@ function rettab.mpdsteam(widget, args)
         return gray .. "mpd " .. coldef .. white .. "paused" .. coldef
     else
         return ""
+    end
+end
+
+
+function rettab.mpdholo(widget, args)
+	if args["{state}"] == "Play" then
+        if args["{Title}"] ~= curr_track then
+            curr_track = args["{Title}"]
+            os.execute(scriptdir .. "mpdinfo")
+            old_id = naughty.notify({
+                title = "Now playing",
+                text = args["{Artist}"] .. " (" .. args["{Album}"] .. ")\n" .. args["{Title}"],
+                icon = "/tmp/mpdnotify_cover.png",
+                fg = beautiful.fg_normal,
+                bg = beautiful.bg_normal,
+                timeout = 5,
+                replaces_id = old_id
+            }).id
+        end
+        mpd_icon:set_image(beautiful.mpd_on)
+        play_pause_icon:set_image(beautiful.pause)
+        return blue  .. "<span font='Tamsyn 1'> </span>" .. args["{Title}"] .. coldef .. holowhite .. " " .. args["{Artist}"] .. coldef .. " " 
+    elseif args["{state}"] == "Pause" then
+        mpd_icon:set_image(beautiful.mpd)
+        play_pause_icon:set_image(beautiful.play)
+
+        return blue .. "<span font='Tamsyn 2'> </span>mpd " .. coldef .. holowhite .. "paused " .. coldef
+	else
+        mpd_icon:set_image(beautiful.mpd)
+        curr_track = nil
+        return "<span font='Tamsyn 3'> </span>"
     end
 end
 
@@ -213,7 +295,12 @@ end
 -- }}}
 
 -- {{{ Gmail functions
- function rettab.mailsteam(widget, args)
+function rettab.mailsteam(widget, args)
+  if beautiful.name == 'holo' then
+    notify_position = 'top_right'
+  else
+    notify_position = 'top_left'
+  end
   notify_title = "You have a new message."
   notify_text = '"' .. args["{subject}"] .. '"'
   if (args["{count}"] > 0 ) then
@@ -227,13 +314,17 @@ end
       end
       naughty.notify({ title = notify_title, text = notify_text,
       timeout = 7,
-      position = "top_left",
+      position = notify_position,
       icon = beautiful.widget_mail_notify,
       fg = beautiful.fg_urgent,
       bg = beautiful.bg_urgent })
       notify_shown = true
     end
-    return gray .. " Mail " .. coldef .. white .. args["{count}"] .. " " .. coldef
+    if beautiful.name == "steamburn" then
+        return gray .. " Mail " .. coldef .. white .. args["{count}"] .. " " .. coldef
+    else
+        return holowhite .. " Mail " .. coldef .. blue .. args["{count}"] .. " " .. coldef
+    end
   else
     notify_shown = false
     return ''
@@ -289,10 +380,8 @@ function rettab.show_calendar(t_out, inc_offset)
     -- let's take font only, font size is set in calendar table
     local font = beautiful.font:sub(beautiful.font:find(""), beautiful.font:find(" "))
 
-    if offs == 0
-    then -- current month showing, today highlighted
-        if today >= 10
-        then
+    if offs == 0 then -- current month showing, today highlighted
+        if today >= 10 then
            init_t = '/usr/bin/cal | sed -r -e "s/(^| )('
         end
 
@@ -334,12 +423,21 @@ function rettab.show_calendar(t_out, inc_offset)
     f:close()
 
     -- notification
-    calendar.id = naughty.notify({ text = c_text,
-                                   icon = calendar.notify_icon,
-                                   fg = calendar.fg, 
-                                   bg = calendar.bg,
-                                   timeout = tims
+    if beautiful.name == "holo" then
+        calendar = naughty.notify({ text = c_text,
+                                    position = "bottom_right", 
+                                    fg = beautiful.fg_normal,
+                                    bg = beautiful.bg_normal,
+                                    timeout = t_out 
                                     })
+    else
+        calendar.id = naughty.notify({ text = c_text,
+                                    icon = calendar.notify_icon,
+                                    fg = calendar.fg, 
+                                    bg = calendar.bg,
+                                    timeout = tims
+                                        })
+    end
 end
 
 function rettab.attach_calendar(widget, background, foreground)
