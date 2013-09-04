@@ -144,7 +144,7 @@ end
 -- This function calls the global 'scriptdir' that must be defined in any rc
 -- that calls it.
 function rettab.showfs(font, size)
-    local font = beautiful.font or font
+    local font = font or beautiful.font
     rettab.removefs()
     local capi = {
         mouse = mouse,
@@ -187,7 +187,7 @@ function rettab.fsholo(widget, args)
       end
       return holowhite .. " Hdd " .. coldef .. blue .. args["{/home/apple/share used_p}"] .. coldef .. " "
   else
-    return ""
+    return " "
   end
 end
 
@@ -262,7 +262,7 @@ function rettab.mpdholo(widget, args)
         end
         mpd_icon:set_image(beautiful.mpd_on)
         play_pause_icon:set_image(beautiful.pause)
-        return blue  .. "<span font='Tamsyn 1'> </span>" .. args["{Title}"] .. coldef .. holowhite .. " " .. args["{Artist}"] .. coldef .. " " 
+        return blue  .. "<span font='Tamsyn 1'> </span>" .. args["{Title}"] .. coldef .. holowhite .. " " .. args["{Artist}"] .. coldef .. " "
     elseif args["{state}"] == "Pause" then
         mpd_icon:set_image(beautiful.mpd)
         play_pause_icon:set_image(beautiful.play)
@@ -394,7 +394,7 @@ function rettab.show_calendar(t_out, inc_offset)
                       .. calendar.foc ..
                       '\\">\\2<\\/span><\\/b>\\3/"',"r" )
 
-    else -- no current month showing, no day to highlight 
+    else -- no current month showing, no day to highlight
        local month = tonumber(os.date('%m'))
        local year = tonumber(os.date('%Y'))
 
@@ -424,19 +424,19 @@ function rettab.show_calendar(t_out, inc_offset)
 
     -- notification
     if beautiful.name == "holo" then
-        calendar = naughty.notify({ text = c_text,
-                                    position = "bottom_right", 
-                                    fg = beautiful.fg_normal,
-                                    bg = beautiful.bg_normal,
-                                    timeout = t_out 
-                                    })
+        calendar.id = naughty.notify({ text = c_text,
+                                       position = "bottom_right",
+                                       fg = beautiful.fg_normal,
+                                       bg = beautiful.bg_normal,
+                                       timeout = t_out
+                                       })
     else
         calendar.id = naughty.notify({ text = c_text,
-                                    icon = calendar.notify_icon,
-                                    fg = calendar.fg, 
-                                    bg = calendar.bg,
-                                    timeout = tims
-                                        })
+                                       icon = calendar.notify_icon,
+                                       fg = calendar.fg,
+                                       bg = calendar.bg,
+                                       timeout = tims
+                                       })
     end
 end
 
@@ -506,7 +506,7 @@ local function create_actual_sizes(wa, sz)
     return pixel_sizes
 end
 
-function rettab.resize(c, scr, size, wiboxhgt)
+function rettab.resize(c, scr, size)
     local cgeom = c:geometry()
     local wa = scr.workarea
     local scrgeom = scr.geometry

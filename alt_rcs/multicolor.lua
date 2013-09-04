@@ -97,8 +97,8 @@ end
 
 -- {{{ Tags
 tags = {
-       names = { "web", "term", "docs", "media", "files", "other" },       
-       layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] } 
+       names = { "web", "term", "docs", "media", "files", "other" },
+       layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -327,9 +327,9 @@ for s = 1, screen.count() do
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
     -- Create the upper wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt }) 
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt })
     --border_width = 0, height =  20 })
-        
+
     -- Widgets that are aligned to the upper left
     local left_layout = wibox.layout.fixed.horizontal()
     --left_layout:add(spacer)
@@ -364,7 +364,7 @@ for s = 1, screen.count() do
     right_layout:add(fshwidget)
     right_layout:add(spacer)
     right_layout:add(uptimeicon)
-    right_layout:add(uptimewidget) 
+    right_layout:add(uptimewidget)
     right_layout:add(spacer)
     right_layout:add(weathericon)
     right_layout:add(weatherwidget)
@@ -374,7 +374,7 @@ for s = 1, screen.count() do
     right_layout:add(spacer)
     right_layout:add(mygmailimg)
     right_layout:add(mygmail)
-    right_layout:add(spacer)     
+    right_layout:add(spacer)
     right_layout:add(baticon)
     right_layout:add(batwidget)
     --right_layout:add(spacer)
@@ -387,22 +387,22 @@ for s = 1, screen.count() do
     layout:set_left(left_layout)
     --layout:set_middle(mytasklist[s])
     layout:set_right(right_layout)
-    
+
     mywibox[s]:set_widget(layout)
 
     -- Create the bottom wibox
     mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = mywiboxhgt })
     --mybottomwibox[s].visible = false
-            
+
     -- Widgets that are aligned to the bottom left
     bottom_left_layout = wibox.layout.fixed.horizontal()
     bottom_left_layout:add(spacer)
-                        
+
     -- Widgets that are aligned to the bottom right
     bottom_right_layout = wibox.layout.fixed.horizontal()
     bottom_right_layout:add(spacer)
     bottom_right_layout:add(mylayoutbox[s])
-                                            
+
     -- Now bring it all together (with the tasklist in the middle)
     bottom_layout = wibox.layout.align.horizontal()
     bottom_layout:set_left(bottom_left_layout)
@@ -544,9 +544,9 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr", mywiboxhgt) end),
     awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
     awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small") end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long") end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
@@ -628,7 +628,7 @@ awful.rules.rules = {
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     { rule = { class = "Tk" },
-      properties = { floating = true } }, 
+      properties = { floating = true } },
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },

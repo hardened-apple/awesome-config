@@ -13,7 +13,7 @@ termfair.name = "termfair"
 -- You can set the number of columns and rows,
 -- otherwise they are read from awful.tag
 nmaster = 2 -- columns
-ncol    = 0 -- rows 
+ncol    = 0 -- rows
 
 function termfair.arrange(p)
 

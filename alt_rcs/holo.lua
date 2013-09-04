@@ -63,7 +63,7 @@ editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 gui_editor = "gvim"
 wifi = terminal .. " -e sudo wifi-menu "
-musicplr = terminal .. " -g 130x34-320+16 -e ncmpcpp "
+musicplr = terminal .. " -g 130x34-320+16 -e ncmpcpp -c ~/.config/ncmpcpp/config "
 
 modkey = "Mod4"
 altkey = "Mod1"
@@ -203,8 +203,8 @@ fshwidget = wibox.widget.textbox()
 too_much = false
 vicious.register(fshwidget, vicious.widgets.fs, gen.fsholo, 600)
 
-fshsize = {margin=10, height=210, width=680}
-fshwidget:connect_signal('mouse::enter', function () gen.showfs(beautiful.font, fshsize) end)
+fshsize = {margin=10, height=170, width=600}
+fshwidget:connect_signal('mouse::enter', function () gen.showfs('Tamsyn 8', fshsize) end)
 fshwidget:connect_signal('mouse::leave', function () gen.removefs() end)
 
 -- Battery widget
@@ -226,7 +226,7 @@ local alsawidget =
     },
     mixer = terminal .. " -e alsamixer", -- or whatever your preferred sound mixer is
     notifications =
-  { 
+  {
     font = "Tamsyn 12",
     bar_size = 32
   }
@@ -292,7 +292,7 @@ function alsawidget:notify ()
 
   local int = math.modf (alsawidget._current_level / 100 * alsawidget.notifications.bar_size)
   preset.text = "[" .. string.rep ("|", int) .. string.rep (" ", alsawidget.notifications.bar_size - int) .. "]"
-    
+
   if alsawidget._notify ~= nil
   then
         alsawidget._notify = naughty.notify (
@@ -435,7 +435,7 @@ for s = 1, screen.count() do
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
-    
+
     -- Create the wibox
     mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt })
 
@@ -474,11 +474,12 @@ for s = 1, screen.count() do
 
     -- Create the bottom wibox
     mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = mywiboxhgt })
-            
+
     -- Widgets that are aligned to the bottom left
     bottom_left_layout = wibox.layout.fixed.horizontal()
     bottom_left_layout:add(awesome_icon)
-                        
+    bottom_left_layout:add(mypromptbox[s])
+
     -- Widgets that are aligned to the bottom right
     bottom_right_layout = wibox.layout.fixed.horizontal()
     bottom_right_layout:add(spr_bottom_right)
@@ -495,7 +496,7 @@ for s = 1, screen.count() do
     bottom_right_layout:add(clock_icon)
     bottom_right_layout:add(clockwidget)
     bottom_right_layout:add(last)
-                                            
+
     -- Now bring it all together (with the tasklist in the middle)
     bottom_layout = wibox.layout.align.horizontal()
     bottom_layout:set_left(bottom_left_layout)
@@ -504,7 +505,7 @@ for s = 1, screen.count() do
     mybottomwibox[s]:set_widget(bottom_layout)
 
     -- Set proper backgrounds, instead of beautiful.bg_normal
-    mywibox[s]:set_bg(beautiful.topbar_path .. screen[1].workarea.width .. ".png")
+    mywibox[s]:set_bg(beautiful.topbar_path .. screen[s].workarea.width .. ".png")
     mybottomwibox[s]:set_bg("#242424")
 end
 
@@ -644,9 +645,9 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr", mywiboxhgt) end),
     awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
     awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long", mywiboxhgt) end),
-    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal", mywiboxhgt) end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small") end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long") end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
@@ -729,7 +730,7 @@ awful.rules.rules = {
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     { rule = { class = "Tk" },
-      properties = { floating = true } }, 
+      properties = { floating = true } },
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },
@@ -832,12 +833,12 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
         local clients = awful.client.visible(s)
         local layout  = awful.layout.getname(awful.layout.get(s))
-    
+
         if #clients > 0 then -- Fine grained borders and floaters control
             for _, c in pairs(clients) do -- Floaters always have borders
                 if awful.client.floating.get(c) or layout == "floating" then
                     c.border_width = beautiful.border_width
-    
+
                 -- No borders with only one visible client
                 elseif #clients == 1 or layout == "max" then
                     clients[1].border_width = 0

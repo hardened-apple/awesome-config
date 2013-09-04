@@ -8,7 +8,7 @@ local function do_three(p)
     local cls = p.clients
 
     if #cls > 0 then
-        
+
         for k, c in ipairs(cls) do
             -- k = k-1 -- Make zero based
             local g = {}

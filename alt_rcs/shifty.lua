@@ -416,7 +416,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
-    
+
     -- Shifty: keybindings specific to shifty
     awful.key({modkey, "Shift"}, "d", shifty.del), -- delete a tag
     awful.key({modkey, "Shift"}, "n", shifty.send_prev), -- client to prev tag
@@ -533,9 +533,9 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "e", function(c) gen.snap(c, screen[c.screen], "tr") end),
     awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl") end),
     awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br") end),
-    awful.key({modkey, "Control"}, "c", function(c) gen.snap(c, screen[c.screen], "brs") end),
-    awful.key({modkey, "Control"}, "x", function(c) gen.snap(c, screen[c.screen], "bml") end),
-    awful.key({modkey, "Control"}, "e", function(c) gen.snap(c, screen[c.screen], "trn") end),
+    awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small") end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long") end),
+    awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal") end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal

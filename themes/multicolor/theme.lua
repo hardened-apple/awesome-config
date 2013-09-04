@@ -65,7 +65,7 @@ theme.taglist_squares_unsel = theme.confdir .. "/taglist/square_b.png"
 
 theme.tasklist_floating = ""
 theme.tasklist_maximized_horizontal = ""
-theme.tasklist_maximized_vertical = "" 
+theme.tasklist_maximized_vertical = ""
 
 theme.layout_tile       = theme.confdir .. "/layouts/tile.png"
 theme.layout_tilegaps   = theme.confdir .. "/layouts/tilegaps.png"
@@ -81,7 +81,7 @@ theme.layout_fullscreen = theme.confdir .. "/layouts/fullscreen.png"
 theme.layout_magnifier  = theme.confdir .. "/layouts/magnifier.png"
 theme.layout_floating   = theme.confdir .. "/layouts/floating.png"
 
---theme.awesome_icon = 
+--theme.awesome_icon =
 -- theme.wallpaper = theme.confdir .. "/coffee_shop.png"
 theme.wallpaper = "~/.config/wallpapers/magic_wather.jpg"
 
