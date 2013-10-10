@@ -513,7 +513,7 @@ function rettab.resize(c, scr, size)
     local newgeom = create_actual_sizes(wa, size)
     newgeom.x, newgeom.y = cgeom.x, cgeom.y
     local borders = find_borders_in_pixels(wa)
-    if cgeom.x + newgeom.width > borders.right + scrgeom.x  or cgeom.x + newgeom.height > borders.bottom + scrgeom.y then
+    if cgeom.x + newgeom.width > borders.right + scrgeom.x  or cgeom.y + newgeom.height > borders.bottom + scrgeom.y then
         newgeom.x = newgeom.x - math.max(cgeom.x + newgeom.width - borders.right - scrgeom.x, 0)
         newgeom.y = newgeom.y - math.max(cgeom.y + newgeom.height - borders.bottom - scrgeom.y, 0)
     end
