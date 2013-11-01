@@ -47,7 +47,8 @@ end
 
 -- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init(configdir .. "/themes/personal/theme.lua")
+beautiful.init(configdir .. "/themes/muted-dream-tree/theme.lua")
+
 mywiboxhgt = 15
 
 -- This is used later as the default terminal and editor to run.
@@ -64,12 +65,19 @@ altkey = "Mod1"
 local layouts =
 {
     awful.layout.suit.fair,
+    mylayouts.fairgaps,
     mylayouts.threep,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
+    mylayouts.fairgaps.horizontal,
+    mylayouts.tilegaps,
+    mylayouts.tilegaps.left,
+    mylayouts.tilegaps.bottom,
+    mylayouts.tilegaps.top,
     awful.layout.suit.floating,
+    mylayouts.spiralgaps,
+    mylayouts.cascade,
+    mylayouts.cascadetile,
+    mylayouts.centerwork,
+    mylayouts.termfair,
 }
 -- }}}
 
@@ -84,9 +92,8 @@ end
 -- {{{ Tags
 
 tags = {
-    -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
     names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
-    layout = { layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[2], layouts[1], layouts[7] }
+    layout = { layouts[3], layouts[1], layouts[2], layouts[1], layouts[4], layouts[1], layouts[5], layouts[7], layouts[9] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -105,7 +112,7 @@ myawesomemenu = {
 
 -- Add menu in here
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Applications", app_menu.menu.Applications, beautiful.app_menu_icon },
+                                    { "Firefox", "/usr/bin/firefox" },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -130,14 +137,15 @@ volwidget = wibox.widget.textbox()
 vicious.register(volwidget, vicious.widgets.volume, gen.volnorm, 1, "Master")
 
 -- mpd widget, what song is playing
+-- taken from copycat-killer/awesome-copycats
 mpdwidget = wibox.widget.textbox()
-vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdnorm, 1)
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdsteam, 1)
 
--- battery widget
+
 batwidget = wibox.widget.textbox()
 vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 60, 'BAT0')
 
--- textclock
+
 datewidget = wibox.widget.textbox()
 vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
 gen.attach_calendar(datewidget, beautiful.bg_normal, beautiful.fg_normal)
@@ -226,10 +234,9 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(myspacer)
-    right_layout:add(batwidget)
-    right_layout:add(myspacer)
-    right_layout:add(myspacer)
     right_layout:add(datewidget)
+    right_layout:add(myspacer)
+    right_layout:add(batwidget)
     right_layout:add(myspacer)
     right_layout:add(volwidget)
     right_layout:add(myspacer)
@@ -341,6 +348,15 @@ globalkeys = awful.util.table.join(
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
               end),
+
+    awful.key({altkey}, "t",
+              function()
+                  awful.prompt.run({ prompt = "Change theme: " },
+                                    mypromptbox[mouse.screen].widget,
+                                    function(mytext)
+                                        gen.change_theme(scriptdir, mytext)
+                                    end)
+              end),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
@@ -447,10 +463,8 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
-    -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
       properties = { floating = true } },
     { rule = { class = "feh" },

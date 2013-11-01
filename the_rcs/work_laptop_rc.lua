@@ -17,6 +17,7 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local mywidgets  = require("mywidgets")
 -- }}}
 
 -- {{{ Error Handling
@@ -47,8 +48,7 @@ end
 
 -- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init(configdir .. "/themes/muted-dream-tree/theme.lua")
-
+beautiful.init(configdir .. "/themes/personal/theme.lua")
 mywiboxhgt = 15
 
 -- This is used later as the default terminal and editor to run.
@@ -65,19 +65,12 @@ altkey = "Mod1"
 local layouts =
 {
     awful.layout.suit.fair,
-    mylayouts.fairgaps,
     mylayouts.threep,
-    mylayouts.fairgaps.horizontal,
-    mylayouts.tilegaps,
-    mylayouts.tilegaps.left,
-    mylayouts.tilegaps.bottom,
-    mylayouts.tilegaps.top,
+    awful.layout.suit.fair.horizontal,
+    awful.layout.suit.tile,
+    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile.top,
     awful.layout.suit.floating,
-    mylayouts.spiralgaps,
-    mylayouts.cascade,
-    mylayouts.cascadetile,
-    mylayouts.centerwork,
-    mylayouts.termfair,
 }
 -- }}}
 
@@ -90,10 +83,10 @@ end
 -- }}}
 
 -- {{{ Tags
-
 tags = {
+    -- names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "〇", "ㄛ", "ㄎ" },
     names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
-    layout = { layouts[3], layouts[1], layouts[2], layouts[1], layouts[4], layouts[1], layouts[5], layouts[7], layouts[9] }
+    layout = { layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[1], layouts[7] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -112,7 +105,7 @@ myawesomemenu = {
 
 -- Add menu in here
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Firefox", "/usr/bin/firefox" },
+                                    { "Applications", app_menu.menu.Applications, beautiful.app_menu_icon },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -130,25 +123,46 @@ myspacer = wibox.widget.textbox(' ')
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
-vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, "wlp5s0")
+vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, "wlp12s0")
 
 -- volume widget
 volwidget = wibox.widget.textbox()
 vicious.register(volwidget, vicious.widgets.volume, gen.volnorm, 1, "Master")
 
 -- mpd widget, what song is playing
--- taken from copycat-killer/awesome-copycats
 mpdwidget = wibox.widget.textbox()
-vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdsteam, 1)
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdnorm, 1)
 
 
-batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 60, 'BAT0')
+-- cpu graph widget
+cpuwidget = awful.widget.graph()
+cpuwidget:set_width(50)
+cpuwidget:set_background_color("#222222")
+cpuwidget:set_color({type="linear", from={0, 0}, to={10, 0}, stops={ {0, "#FF5656"}, {0.5, "#88A175"}, {1, "#AECF96"}}})
+vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 
 
-datewidget = wibox.widget.textbox()
-vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
-gen.attach_calendar(datewidget, beautiful.bg_normal, beautiful.fg_normal)
+-- ram revgraph widget
+ramwidget = mywidgets.revgraph()
+ramwidget:set_width(50)
+ramwidget:set_background_color("#222222")
+ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}}})
+vicious.register(ramwidget, vicious.widgets.mem, "$1")
+
+-- battery widget
+batwidget = awful.widget.progressbar()
+batwidget:set_width(100)
+batwidget:set_height(3)
+batwidget:set_vertical(false)
+batwidget:set_background_color('#000000')
+batwidget:set_border_color(nil)
+batwidget:set_color("#00bfff")
+vicious.register(batwidget, vicious.widgets.bat, gen.batbar, 30, "BAT0")
+
+
+-- textclock
+mytextclock = awful.widget.textclock()
+gen.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
 -- }}}
 
 -- Create a wibox for each screen and add it
@@ -225,24 +239,22 @@ for s = 1, screen.count() do
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
+    left_layout:add(cpuwidget)
     left_layout:add(myspacer)
     left_layout:add(mpdwidget)
-    left_layout:add(myspacer)
     left_layout:add(mypromptbox[s])
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(myspacer)
-    right_layout:add(datewidget)
+    right_layout:add(ramwidget)
     right_layout:add(myspacer)
     right_layout:add(batwidget)
     right_layout:add(myspacer)
     right_layout:add(volwidget)
     right_layout:add(myspacer)
-    right_layout:add(wifiwidget)
-    right_layout:add(myspacer)
-    right_layout:add(myspacer)
+    right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
@@ -347,6 +359,15 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
+              end),
+
+    awful.key({altkey}, "t",
+              function()
+                  awful.prompt.run({ prompt = "Change theme: " },
+                                    mypromptbox[mouse.screen].widget,
+                                    function(mytext)
+                                        gen.change_theme(scriptdir, mytext)
+                                    end)
               end),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
@@ -454,14 +475,20 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
+    -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
+    -- Set tk interfaces to float and have the menubar
     { rule = { class = "Tk" },
+      properties = { floating = true } },
+    { rule = { name = "Figure 1" },
       properties = { floating = true } },
     { rule = { class = "feh" },
       properties = { floating = true } },
     { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
+    { rule = { class = "ROX-Filer" },
+      properties = { floating = true } },
 }
 -- }}}
 
@@ -489,7 +516,7 @@ client.connect_signal("manage", function (c, startup)
     end
 
     local titlebars_enabled = false
-    if c.class == "feh" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
+    if c.class == "feh" or c.class == "ROX-Filer" or titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
 
         -- Widgets that are aligned to the left
         local left_layout = wibox.layout.fixed.horizontal()
@@ -534,4 +561,4 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 
--- vim: set foldmethod=marker:
+-- vim: set foldmethod=marker filetype=lua:

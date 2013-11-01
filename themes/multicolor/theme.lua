@@ -83,6 +83,7 @@ theme.layout_floating   = theme.confdir .. "/layouts/floating.png"
 
 --theme.awesome_icon =
 -- theme.wallpaper = theme.confdir .. "/coffee_shop.png"
-theme.wallpaper = "~/.config/wallpapers/magic_wather.jpg"
+-- theme.wallpaper = "~/.config/wallpapers/magic_wather.jpg"
+theme.wallpaper = theme.confdir .. "/magic_water.jpg"
 
 return theme

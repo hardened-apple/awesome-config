@@ -523,6 +523,20 @@ end
 
 -- }}}
 
+-- {{{ change theme
+function rettab.run_script(script, myprompt, promptbox)
+    awful.prompt.run({prompt=myprompt}, promptbox[mouse.screen].widget,
+                        function(text)
+                            os.execute(script .. text)
+                        end)
+end
+
+function rettab.change_theme(scriptdir, themename)
+    os.execute(scriptdir .. 'change_theme.sh ' .. themename)
+    awesome.restart()
+end
+-- }}}
+
 return rettab
 
 -- vim: foldmethod=marker:

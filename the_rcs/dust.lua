@@ -1,11 +1,3 @@
---[[                                    ]]--
---                                        -
---   Multicolor Awesome WM 3.5.+ config   --
---       github.com/copycat-killer        --
---                                        -
---[[                                    ]]--
-
-
 -- Standard awesome library {{{
 local gears           = require("gears")
 local awful           = require("awful")
@@ -55,14 +47,14 @@ end
 
 -- {{{ Variable Definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init(configdir .. "/themes/multicolor/theme.lua")
+beautiful.init(configdir .. "/themes/dust/theme.lua")
 
-mywiboxhgt = 20
+mywiboxhgt = 15
 
+-- This is used later as the default terminal and editor to run.
 terminal = "xterm"
-editor = os.getenv("EDITOR") or "vim"
+editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
-tasks = terminal .. " -e htop "
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -72,18 +64,13 @@ altkey = "Mod1"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
-    awful.layout.suit.floating,             -- 1
-    awful.layout.suit.tile,                 -- 2
-    awful.layout.suit.tile.left,            -- 3
-    awful.layout.suit.tile.bottom,          -- 4
-    awful.layout.suit.tile.top,             -- 5
-    awful.layout.suit.fair,                 -- 6
-    awful.layout.suit.fair.horizontal,      -- 7
-    awful.layout.suit.spiral,               -- 8
-    awful.layout.suit.spiral.dwindle,       -- 9
-    awful.layout.suit.max,                  -- 10
-    --awful.layout.suit.max.fullscreen,     -- 11
-    --awful.layout.suit.magnifier           -- 12
+    awful.layout.suit.fair,
+    mylayouts.threep,
+    awful.layout.suit.fair.horizontal,
+    awful.layout.suit.tile,
+    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile.top,
+    awful.layout.suit.floating,
 }
 -- }}}
 
@@ -97,12 +84,12 @@ end
 
 -- {{{ Tags
 tags = {
-       names = { "web", "term", "docs", "media", "files", "other" },
-       layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] }
+    names = { "ㄡ", "ㄠ", "ㄓ", "ㄕ", "ㄈ", "ㄒ", "ハ", "ㄏ", "ㄎ" },
+    layout = { layouts[1], layouts[1], layouts[1], layouts[2], layouts[1], layouts[1], layouts[7], layouts[1], layouts[7] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag(tags.names, s, tags.layout)
+    tags[s] = awful.tag( tags.names, s, tags.layout)
 end
 -- }}}
 
@@ -130,142 +117,39 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- {{{ Widgets
--- Separators
-spacer = wibox.widget.textbox(" ")
+-- {{{ Define widgets
+myspacer = wibox.widget.textbox()
+myspacer:set_text(' ')
 
--- Colours
-coldef  = "</span>"
-colwhi  = "<span color='#b2b2b2'>"
-colbwhi = "<span color='#ffffff'>"
-blue = "<span color='#7493d2'>"
-yellow = "<span color='#e0da37'>"
-purple = "<span color='#e33a6e'>"
-lightpurple = "<span color='#eca4c4'>"
-azure = "<span color='#80d9d8'>"
-green = "<span color='#87af5f'>"
-lightgreen = "<span color='#62b786'>"
-red = "<span color='#e54c62'>"
-orange = "<span color='#ff7100'>"
-brown = "<span color='#db842f'>"
-fuchsia = "<span color='#800080'>"
-gold = "<span color='#e7b400'>"
+-- Wifi widget - just tell me if the wifi is up
+wifiwidget = wibox.widget.textbox()
+vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, "wlp5s0")
 
--- Textclock widget
-clockicon = wibox.widget.imagebox()
-clockicon:set_image(beautiful.widget_clock)
-mytextclock = awful.widget.textclock("<span color='#7788af'>%A %d %B</span> " .. blue .. "</span><span color=\"#343639\">></span> <span color='#de5e1e'>%H:%M</span> ")
+-- volume widget
+volwidget = wibox.widget.textbox()
+vicious.register(volwidget, vicious.widgets.volume, gen.volnorm, 1, "Master")
 
-gen.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
-
--- Vicious weather widget
-weathericon = wibox.widget.imagebox()
-weathericon:set_image(theme.confdir .. "/widgets/dish.png")
-weatherwidget = wibox.widget.textbox()
-vicious.register(weatherwidget, vicious.widgets.weather,
-    function (widget, args)
-        if args["{tempf}"] == "N/A" then
-            return "No Info"
-        else
-            return "" .. lightpurple .. args["{sky}"] .. " @ " .. args["{tempc}"] .. "°C" .. coldef .. ""
-        end
-    end, 1800, "EGCC" )
-
--- Mail widget
-mygmail = wibox.widget.textbox()
-gmail_t = awful.tooltip({ objects = { mygmail },})
-mygmailimg = wibox.widget.imagebox(beautiful.widget_gmail)
-vicious.register(mygmail, vicious.widgets.gmail,
-                function (widget, args)
-                    gmail_t:set_text(args["{subject}"])
-                    gmail_t:add_to_object(mygmailimg)
-                    return args["{count}"]
-                 end, 120)
-
--- MPD Widget
+-- mpd widget, what song is playing
 mpdwidget = wibox.widget.textbox()
-mpdicon = wibox.widget.imagebox()
-mpdicon:set_image(theme.confdir .. "/widgets/note.png")
+vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdnorm, 1)
 
-vicious.register(mpdwidget, vicious.widgets.mpd, gen.mpdcol, 1)
-
-
--- Uptime
-uptimeicon = wibox.widget.imagebox()
-uptimeicon:set_image(beautiful.widget_uptime)
-uptimewidget = wibox.widget.textbox()
-vicious.register(uptimewidget, vicious.widgets.uptime, brown .. "$2.$3" .. coldef)
-
--- CPU widget
-cpuicon = wibox.widget.imagebox()
-cpuicon:set_image(beautiful.widget_cpu)
-cpuwidget = wibox.widget.textbox()
-vicious.register(cpuwidget, vicious.widgets.cpu, purple .. "$1%" .. coldef, 3)
-cpuicon:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn(tasks, false) end)))
-
--- Temp widget
-tempicon = wibox.widget.imagebox()
-tempicon:set_image(beautiful.widget_temp)
-tempicon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function () awful.util.spawn(terminal .. " -e sudo powertop ", false) end)
-    ))
-   tempwidget = wibox.widget.textbox()
-   vicious.register(tempwidget, vicious.widgets.thermal, "<span color=\"#f1af5f\">$1°C</span>", 9, {"coretemp.0", "core"} )
-
--- /home fs widget
-fshicon = wibox.widget.imagebox()
-fshicon:set_image(theme.confdir .. "/widgets/fs.png")
-fshwidget = wibox.widget.textbox()
-vicious.register(fshwidget, vicious.widgets.fs, gen.fscol, 620)
-
-
-fshsize = {margin=10, height=170, width=600}
-fshwidget:connect_signal('mouse::enter', function () gen.showfs('Terminus', fshsize) end)
-fshwidget:connect_signal('mouse::leave', function () gen.removefs() end)
-
--- Battery widget
-baticon = wibox.widget.imagebox()
-baticon:set_image(beautiful.widget_batt)
+-- battery widget
 batwidget = wibox.widget.textbox()
-vicious.register( batwidget, vicious.widgets.bat, "$2", 1, "BAT0")
+vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 60, 'BAT0')
 
-batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat, gen.batnorm, 1, 'BAT0')
-
--- Volume widget
-volicon = wibox.widget.imagebox()
-volicon:set_image(beautiful.widget_vol)
-volumewidget = wibox.widget.textbox()
-vicious.register(volumewidget, vicious.widgets.volume, blue .. "$1%" .. coldef,  1, "Master")
-
--- Net widget
-netdownicon = wibox.widget.imagebox()
-netdownicon:set_image(beautiful.widget_netdown)
-netdownicon.align = "middle"
-netdowninfo = wibox.widget.textbox()
-vicious.register(netdowninfo, vicious.widgets.net, green .. "${wlp5s0 down_kb}" .. coldef, 1)
-netupicon = wibox.widget.imagebox()
-netupicon:set_image(beautiful.widget_netup)
-netupicon.align = "middle"
-netupinfo = wibox.widget.textbox()
-vicious.register(netupinfo, vicious.widgets.net, red .. "${wlp5s0 up_kb}" .. coldef, 1)
-
--- Memory widget
-memicon = wibox.widget.imagebox()
-memicon:set_image(beautiful.widget_mem)
-memwidget = wibox.widget.textbox()
-vicious.register(memwidget, vicious.widgets.mem, yellow .. "$1%" .. coldef, 1)
-
+-- textclock
+datewidget = wibox.widget.textbox()
+vicious.register(datewidget, vicious.widgets.date, "%a: %R ", 60)
+gen.attach_calendar(datewidget, beautiful.bg_normal, beautiful.fg_normal)
 
 -- }}}
 
--- {{{ Layout
-
 -- Create a wibox for each screen and add it
 mywibox = {}
-mybottomwibox = {}
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
+-- Buttons {{{
 mytaglist.buttons = awful.util.table.join(
                     awful.button({ }, 1, awful.tag.viewonly),
                     awful.button({ modkey }, 1, awful.client.movetotag),
@@ -325,93 +209,44 @@ for s = 1, screen.count() do
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
+-- }}}
 
-    -- Create the upper wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = mywiboxhgt })
-    --border_width = 0, height =  20 })
+    -- Create the wibox {{{
+    mywibox[s] = awful.wibox({ position = "top", height = mywiboxhgt, screen = s })
 
-    -- Widgets that are aligned to the upper left
+    -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
-    --left_layout:add(spacer)
-    --left_layout:add(mylauncher)
-    --left_layout:add(spacer)
+    left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
-    left_layout:add(mypromptbox[s])
-    --left_layout:add(spacer)
-    left_layout:add(mpdicon)
+    left_layout:add(myspacer)
     left_layout:add(mpdwidget)
-    --left_layout:add(spacer)
+    left_layout:add(myspacer)
+    left_layout:add(mypromptbox[s])
 
-    -- Widgets that are aligned to the upper right
+    -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    right_layout:add(netdownicon)
-    right_layout:add(netdowninfo)
-    right_layout:add(spacer)
-    right_layout:add(netupicon)
-    right_layout:add(netupinfo)
-    right_layout:add(spacer)
-    right_layout:add(volicon)
-    right_layout:add(volumewidget)
-    right_layout:add(spacer)
-    right_layout:add(memicon)
-    right_layout:add(memwidget)
-    right_layout:add(spacer)
-    right_layout:add(cpuicon)
-    right_layout:add(cpuwidget)
-    right_layout:add(spacer)
-    right_layout:add(fshicon)
-    right_layout:add(fshwidget)
-    right_layout:add(spacer)
-    right_layout:add(uptimeicon)
-    right_layout:add(uptimewidget)
-    right_layout:add(spacer)
-    right_layout:add(weathericon)
-    right_layout:add(weatherwidget)
-    right_layout:add(spacer)
-    right_layout:add(tempicon)
-    right_layout:add(tempwidget)
-    right_layout:add(spacer)
-    right_layout:add(mygmailimg)
-    right_layout:add(mygmail)
-    right_layout:add(spacer)
-    right_layout:add(baticon)
+    right_layout:add(myspacer)
     right_layout:add(batwidget)
-    --right_layout:add(spacer)
-    right_layout:add(clockicon)
-    right_layout:add(mytextclock)
-    --right_layout:add(mylayoutbox[s])
+    right_layout:add(myspacer)
+    right_layout:add(datewidget)
+    right_layout:add(myspacer)
+    right_layout:add(volwidget)
+    right_layout:add(myspacer)
+    right_layout:add(wifiwidget)
+    right_layout:add(myspacer)
+    right_layout:add(myspacer)
+    right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
-    --layout:set_middle(mytasklist[s])
+    layout:set_middle(mytasklist[s])
     layout:set_right(right_layout)
 
     mywibox[s]:set_widget(layout)
-
-    -- Create the bottom wibox
-    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = mywiboxhgt })
-    --mybottomwibox[s].visible = false
-
-    -- Widgets that are aligned to the bottom left
-    bottom_left_layout = wibox.layout.fixed.horizontal()
-    bottom_left_layout:add(spacer)
-
-    -- Widgets that are aligned to the bottom right
-    bottom_right_layout = wibox.layout.fixed.horizontal()
-    bottom_right_layout:add(spacer)
-    bottom_right_layout:add(mylayoutbox[s])
-
-    -- Now bring it all together (with the tasklist in the middle)
-    bottom_layout = wibox.layout.align.horizontal()
-    bottom_layout:set_left(bottom_left_layout)
-    bottom_layout:set_middle(mytasklist[s])
-    bottom_layout:set_right(bottom_right_layout)
-    mybottomwibox[s]:set_widget(bottom_layout)
-
 end
-
+-- }}}
 -- }}}
 
 -- {{{ Mouse bindings
@@ -422,17 +257,8 @@ root.buttons(awful.util.table.join(
 ))
 -- }}}
 
--- {{{ Keys
--- {{{ Globalkeys
+-- {{{ Key bindings
 globalkeys = awful.util.table.join(
-
-    -- Move clients
-    awful.key({ altkey }, "Next",  function () awful.client.moveresize( 1,  1, -2, -2) end),
-    awful.key({ altkey }, "Prior", function () awful.client.moveresize(-1, -1,  2,  2) end),
-    -- awful.key({ altkey }, "Down",  function () awful.client.moveresize(  0,  1,   0,   0) end),
-    -- awful.key({ altkey }, "Up",    function () awful.client.moveresize(  0, -1,   0,   0) end),
-    -- awful.key({ altkey }, "Left",  function () awful.client.moveresize(-1,   0,   0,   0) end),
-    -- awful.key({ altkey }, "Right", function () awful.client.moveresize( 1,   0,   0,   0) end),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
@@ -469,12 +295,7 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
 
-    awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true}) end),
-
-    -- Show/Hide Wibox
-    awful.key({ modkey }, "b", function ()
-    mywibox[mouse.screen].visible = not mywibox[mouse.screen].visible
-    end),
+    awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -519,13 +340,19 @@ globalkeys = awful.util.table.join(
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
               end),
+
+    awful.key({altkey}, "t",
+              function()
+                  awful.prompt.run({ prompt = "Change theme: " },
+                                    mypromptbox[mouse.screen].widget,
+                                    function(mytext)
+                                        gen.change_theme(scriptdir, mytext)
+                                    end)
+              end),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
--- Add ror to globalkeys
-globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
---}}}
---{{{ Clientkeys
+
 clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
@@ -553,8 +380,9 @@ clientkeys = awful.util.table.join(
             c.maximized_vertical   = not c.maximized_vertical
         end)
 )
--- }}}
--- {{{ Tag motions
+-- Add ror to globalkeys
+globalkeys = awful.util.table.join(globalkeys, ror.genkeys(modkey))
+
 -- Compute the maximum number of digit we need, limited to 9
 keynumber = 0
 for s = 1, screen.count() do
@@ -597,8 +425,8 @@ for i = 1, keynumber do
                       end
                   end))
 end
--- }}}
--- {{{ set rootkeys, define client buttons
+
+
 clientbuttons = awful.util.table.join(
     -- add the c:raise() in this function to allow raise on click
     awful.button({ }, 1, function (c) client.focus = c end), -- ; c:raise() end),
@@ -607,7 +435,6 @@ clientbuttons = awful.util.table.join(
 
 -- Set keys
 root.keys(globalkeys)
--- }}}
 -- }}}
 
 -- {{{ Rules
@@ -624,7 +451,7 @@ awful.rules.rules = {
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
     { rule = { class = "Firefox" },
-      properties = { tag = tags[1][1], floating = true } },
+      properties = { tag = tags[1][9], floating = true } },
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     { rule = { class = "Tk" },
@@ -633,12 +460,6 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "XTerm" },
       properties = { opacity = 0.6 } },
-    { rule = { class = "Zathura" },
-        properties = { tag = tags[1][3] } },
-    { rule = { class = "Rtorrent" },
-          properties = { tag = tags[1][6] } },
-    { rule = { class = "Torrent-search" },
-          properties = { tag = tags[1][6] } },
 }
 -- }}}
 

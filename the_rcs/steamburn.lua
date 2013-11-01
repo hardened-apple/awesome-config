@@ -411,6 +411,15 @@ globalkeys = awful.util.table.join(
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
               end),
+
+    awful.key({altkey}, "t",
+              function()
+                  awful.prompt.run({ prompt = "Change theme: " },
+                                    mypromptbox[mouse.screen].widget,
+                                    function(mytext)
+                                        gen.change_theme(scriptdir, mytext)
+                                    end)
+              end),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end)
 )
