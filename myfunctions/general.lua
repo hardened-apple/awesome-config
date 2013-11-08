@@ -531,9 +531,24 @@ function rettab.run_script(script, myprompt, promptbox)
                         end)
 end
 
+mythemes = {multicolor = "awesome", steamburn = "awesome", muted = "awesome",
+            main = "awesome", dust = "awesome", holo = "awesome", shifty = "awesome",
+            pek_woman = "pek", pek_build = "pek", pek_pier = "pek",
+            pek_windmill = "pek", subtle_new = "subtle", subtle_orig = "subtle"}
+
+-- Changes theme, if changing to awesome then change the rc.lua (link to
+--       different place) and restart, if changing to other window manager, then use
+--       exec on a script and let the script use exec on the new WM
 function rettab.change_theme(scriptdir, themename)
-    os.execute(scriptdir .. 'change_theme.sh ' .. themename)
-    awesome.restart()
+    if mythemes[themename] == "awesome" then
+        os.execute(scriptdir .. 'change_theme.sh ' .. themename)
+        awesome.restart()
+    elseif mythemes[themename] == "pek" or mythemes[themename] == "subtle" then
+        -- Replace awesome with the shell script that changes the xresources
+        -- and sets the background, then replaces itself with a new swindow
+        -- manager
+        awesome.exec(scriptdir .. 'change_theme.sh ' .. themename)
+    end
 end
 -- }}}
 

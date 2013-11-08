@@ -1,6 +1,20 @@
 #!/usr/bin/sh
 
-setupnew () {
+subtle_start () {
+    xrdb -merge ~/xresources/$1
+    feh --bg-fill ~/.config/wallpapers/$2
+    xmodmap ~/xmodmaps/xmodmap_super
+    exec subtle >> ~/.cache/subtle/stdout 2>> ~/.cache/subtle/stderr
+}
+
+pek_start() {
+    xrdb -load ~/xresources/base_resources
+    xrdb -merge $1
+    feh --bg-fill ~/.config/wallpapers/$2 &
+    exec pekwm --config ~/.config/pekwm/$3
+}
+
+setupnewawesome () {
     ln -sf $1 ~/.config/awesome/rc.lua
     xrdb -load ~/xresources/base_resources
     xrdb -merge $2
@@ -26,31 +40,55 @@ MUTEDCOLS=~/xresources/awesome_muted_resources
 MAINCOLS=~/xresources/awesome_personal_resources
 
 case $1 in
+    "pek_woman")
+        pek_start standard_but_calmer multiimage_woman.jpg config
+        ;;
+
+    "pek_build")
+        pek_start standard_but_calmer skippin___skool_by_ether.jpg config
+        ;;
+
+     "pek_pier")
+        pek_start awesome_personal_resources pier_house.jpg windmill
+        ;;
+
+    "pek_windmill")
+        pek_start vinyl windmill_sillhouette.jpg windmill
+        ;;
+
+    "subtle_new")
+        subtle_start awesome_personal_resources earthrise_1.jpg
+        ;;
+
+    "subtle_orig")
+        subtle_start subtle_initial_resources block_colours_woman_sunglasses.jpg
+        ;;
+
     "shifty")  
-        setupnew $SHIFTYRC $SHIFTYCOLS
+        setupnewawesome $SHIFTYRC $SHIFTYCOLS
         ;;
 
     "holo")
-        setupnew $HOLORC $HOLOCOLS
+        setupnewawesome $HOLORC $HOLOCOLS
         ;;
 
     "dust")  
-        setupnew $DUSTRC $DUSTCOLS
+        setupnewawesome $DUSTRC $DUSTCOLS
         ;;
 
     "multicolor")  
-        setupnew $MULTICOLORRC $MULTICOLORCOLS
+        setupnewawesome $MULTICOLORRC $MULTICOLORCOLS
         ;;
 
     "steamburn")  
-        setupnew $STEAMBURNRC $STEAMBURNCOLS
+        setupnewawesome $STEAMBURNRC $STEAMBURNCOLS
         ;;
 
     "muted")  
-        setupnew $MUTEDRC $MUTEDCOLS
+        setupnewawesome $MUTEDRC $MUTEDCOLS
         ;;
 
     "main")  
-        setupnew $MAINRC $MAINCOLS
+        setupnewawesome $MAINRC $MAINCOLS
         ;;
 esac
