@@ -1,6 +1,7 @@
 #!/usr/bin/sh
 
 subtle_start () {
+    xrdb -load ~/xresources/base_resources
     xrdb -merge ~/xresources/$1
     feh --bg-fill ~/.config/wallpapers/$2
     xmodmap ~/xmodmaps/xmodmap_super
@@ -9,7 +10,7 @@ subtle_start () {
 
 pek_start() {
     xrdb -load ~/xresources/base_resources
-    xrdb -merge $1
+    xrdb -merge ~/xresources/$1
     feh --bg-fill ~/.config/wallpapers/$2 &
     exec pekwm --config ~/.config/pekwm/$3
 }
