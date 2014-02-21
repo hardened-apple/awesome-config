@@ -446,7 +446,7 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
     awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
     awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small") end),
-    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long") end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "tall") end),
     awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal") end),
     awful.key({ modkey,           }, "m",
         function (c)

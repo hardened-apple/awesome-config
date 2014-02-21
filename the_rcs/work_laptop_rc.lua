@@ -146,7 +146,7 @@ vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 ramwidget = mywidgets.revgraph()
 ramwidget:set_width(50)
 ramwidget:set_background_color("#222222")
-ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}}})
+ramwidget:set_color({type="linear", from={0, 0}, to={45, 0}, stops={ {0, "#AECF96"}, {8, "#AECF96"}, {9.2, "#00FF00"}, {10, "#FF5656"}} })
 vicious.register(ramwidget, vicious.widgets.mem, "$1")
 
 -- battery widget
@@ -165,7 +165,7 @@ mytextclock = awful.widget.textclock()
 gen.attach_calendar(mytextclock, beautiful.bg_normal, beautiful.fg_normal)
 -- }}}
 
--- Create a wibox for each screen and add it
+-- Create a wibox for each screen and add it {{{
 mywibox = {}
 mypromptbox = {}
 mylayoutbox = {}
@@ -395,7 +395,7 @@ clientkeys = awful.util.table.join(
     awful.key({modkey}, "z", function(c) gen.snap(c, screen[c.screen], "bl", mywiboxhgt) end),
     awful.key({modkey}, "c", function(c) gen.snap(c, screen[c.screen], "br", mywiboxhgt) end),
     awful.key({modkey, "Control"}, "c", function(c) gen.resize(c, screen[c.screen], "small") end),
-    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "long") end),
+    awful.key({modkey, "Control"}, "x", function(c) gen.resize(c, screen[c.screen], "tall") end),
     awful.key({modkey, "Control"}, "e", function(c) gen.resize(c, screen[c.screen], "normal") end),
     awful.key({ modkey,           }, "m",
         function (c)

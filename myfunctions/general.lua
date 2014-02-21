@@ -457,7 +457,7 @@ end
 -- All values are in percentage of workarea, borders are from edge of monitor
 local abstract_borders = {top=0.008, side=0.006}
 
-local abstract_sizes = {small={0.35, 0.5}, normal={0.43, 0.44}, long={0.3, 0.987}}
+local abstract_sizes = {small={0.3, 0.3}, normal={0.35, 0.35}, tall={0.98, 0.35}}
 
 local abstract_positions = {tl=function(g) return {borders['top'], borders['left']} end,
                             tr=function(g) return {borders['top'], borders['right'] - g.width} end,
