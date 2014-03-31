@@ -477,6 +477,8 @@ awful.rules.rules = {
       properties = { tag = tags[1][9], floating = true } },
     { rule = { class = "VirtualBox" },
       properties = { floating = true } },
+    { rule = { name = "Mendeley Desktop" },
+      properties = { floating = true } },
     -- Set Xmessage windows to always float
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
