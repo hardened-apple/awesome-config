@@ -132,6 +132,7 @@ end
 -- }}}
 
 -- {{{ Disk space functions
+local viewformat = "{/ used_p}"
 local infos = nil
 
 function rettab.removefs()
@@ -164,20 +165,20 @@ function rettab.showfs(font, size)
 end
 
 function rettab.fssteam(widget, args)
-  if ( args["{/home/apple/share used_p}"] >= 99 ) then
+  if ( args[viewformat] >= 99 ) then
     naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
     timeout = 10,
     position = "top_right",
     fg = beautiful.fg_urgent,
     bg = beautiful.bg_urgent })
   end
-  return gray .. "Hdd " .. coldef .. white .. args["{/home/apple/share used_p}"] .. coldef
+  return gray .. "Hdd " .. coldef .. white .. args[viewformat] .. coldef
 end
 
 
 function rettab.fsholo(widget, args)
-  if ( args["{/home/apple/share used_p}"] >= 90 ) then
-      if ( args["{/home/apple/share used_p}"] >= 99 and too_much == false ) then
+  if ( args[viewformat] >= 90 ) then
+      if ( args[viewformat] >= 99 and too_much == false ) then
         naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
         timeout = 7,
         position = "top_right",
@@ -185,7 +186,7 @@ function rettab.fsholo(widget, args)
         bg = beautiful.bg_urgent })
         too_much = true
       end
-      return holowhite .. " Hdd " .. coldef .. blue .. args["{/home/apple/share used_p}"] .. coldef .. " "
+      return holowhite .. " Hdd " .. coldef .. blue .. args[viewformat] .. coldef .. " "
   else
     return " "
   end
@@ -193,17 +194,17 @@ end
 
 
 function rettab.fscol(widget, args)
-    if args["{/home/apple/share used_p}"] >= 90 and args["{/home/apple/share used_p}"] < 99 then
-        return colwhi .. args["{/home/apple/share used_p}"] .. "%" .. coldef
-    elseif args["{/home/apple/share used_p}"] >= 99 then
+    if args[viewformat] >= 90 and args[viewformat] < 99 then
+        return colwhi .. args[viewformat] .. "%" .. coldef
+    elseif args[viewformat] >= 99 then
         naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
                             timeout = 10,
                             position = "top_right",
                             fg = beautiful.fg_urgent,
                             bg = beautiful.bg_urgent })
-        return colwhi .. args["{/home/apple/share used_p}"] .. "%" .. coldef
+        return colwhi .. args[viewformat] .. "%" .. coldef
     else
-        return azure .. args["{/home/apple/share used_p}"] .. "%" .. coldef
+        return azure .. args[viewformat] .. "%" .. coldef
     end
 end
 -- }}}
