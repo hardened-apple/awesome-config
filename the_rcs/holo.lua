@@ -736,6 +736,8 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][1], floating = true } },
+    { rule = { class = "VirtualBox" },
+      properties = { floating = true } },
     { rule = { class = "Xmessage" },
       properties = { floating = true } },
     { rule = { class = "Tk" },
