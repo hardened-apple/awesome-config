@@ -25,6 +25,7 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local commonvars = require("commonparts.variables")
 local baserules  = require("commonparts.baserules")
 -- }}}
 
@@ -243,12 +244,12 @@ netdownicon = wibox.widget.imagebox()
 netdownicon:set_image(beautiful.widget_netdown)
 netdownicon.align = "middle"
 netdowninfo = wibox.widget.textbox()
-vicious.register(netdowninfo, vicious.widgets.net, green .. "${wlp5s0 down_kb}" .. coldef, 1)
+vicious.register(netdowninfo, vicious.widgets.net, green .. "${" .. commonvars.wcard .. " down_kb}" .. coldef, 1)
 netupicon = wibox.widget.imagebox()
 netupicon:set_image(beautiful.widget_netup)
 netupicon.align = "middle"
 netupinfo = wibox.widget.textbox()
-vicious.register(netupinfo, vicious.widgets.net, red .. "${wlp5s0 up_kb}" .. coldef, 1)
+vicious.register(netupinfo, vicious.widgets.net, red .. "${" .. commonvars.wcard .. " up_kb}" .. coldef, 1)
 
 -- Memory widget
 memicon = wibox.widget.imagebox()

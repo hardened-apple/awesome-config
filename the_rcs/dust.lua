@@ -17,6 +17,7 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local commonvars = require("commonparts.variables")
 local baserules  = require("commonparts.baserules")
 -- }}}
 
@@ -124,7 +125,7 @@ myspacer:set_text(' ')
 
 -- Wifi widget - just tell me if the wifi is up
 wifiwidget = wibox.widget.textbox()
-vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, "wlp5s0")
+vicious.register(wifiwidget, vicious.widgets.wifi, gen.wifinorm, 10, commonvars.wcard)
 
 -- volume widget
 volwidget = wibox.widget.textbox()

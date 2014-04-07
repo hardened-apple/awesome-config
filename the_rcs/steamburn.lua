@@ -25,8 +25,10 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local commonvars = require("commonparts.variables")
 local baserules  = require("commonparts.baserules")
 -- }}}
+
 
 -- {{{ Error Handling
 
@@ -187,7 +189,7 @@ vicious.register(volumewidget, vicious.widgets.volume, gen.volsteam, 1, "Master"
 
 -- Net widget
 netwidget = wibox.widget.textbox()
-vicious.register(netwidget, vicious.widgets.net, gray .. "Net " .. coldef .. white .. "${wlp5s0 down_kb} " .. "<span font=\"Terminus 8\">↓↑ </span>" .. "${wlp5s0 up_kb} " .. coldef, 3)
+vicious.register(netwidget, vicious.widgets.net, gray .. "Net " .. coldef .. white .. "${" .. commonvars.wcard .. " down_kb} " .. "<span font=\"Terminus 8\">↓↑ </span>" .. "${" .. commonvars.wcard .. " up_kb} " .. coldef, 3)
 netwidget:buttons(awful.util.table.join(awful.button({ }, 1, function () awful.util.spawn_with_shell(wifi) end)))
 
 

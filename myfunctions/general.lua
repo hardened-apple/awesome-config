@@ -4,6 +4,7 @@ local beautiful = require("beautiful")
 local io        = require("io")
 local os        = require("os")
 local tonumber  = tonumber
+local commonvars = require("commonparts.variables")
 
 rettab = {}
 
@@ -39,9 +40,9 @@ function rettab.wifinorm(widget, args)
 end
 
 function rettab.wifiholo(widget, args)
-    if args["{wlp5s0 carrier}"] == 0 then
+    if args["{" .. commonvars.wcard .. " carrier}"] == 0 then
        if no_net_shown == true then
-         naughty.notify({ title = "wlp5s0", text = "No carrier",
+         naughty.notify({ title = "" .. commonvars.wcard .. "", text = "No carrier",
          timeout = 7,
          position = "top_left",
          icon = beautiful.widget_no_net_notify,
@@ -58,7 +59,7 @@ function rettab.wifiholo(widget, args)
          netup_icon:set_image(beautiful.net_up)
          no_net_shown = true
        end
-       return holowhite .. "<span font='Tamsyn 2'> </span>" .. args["{wlp5s0 down_kb}"] .. " - " .. args["{wlp5s0 up_kb}"] .. "<span font='Tamsyn 2'> </span>" .. coldef
+       return holowhite .. "<span font='Tamsyn 2'> </span>" .. args["{" .. commonvars.wcard .. " down_kb}"] .. " - " .. args["{" .. commonvars.wcard .. " up_kb}"] .. "<span font='Tamsyn 2'> </span>" .. coldef
     end
 end
 -- }}}
@@ -166,7 +167,7 @@ end
 
 function rettab.fssteam(widget, args)
   if ( args[viewformat] >= 99 ) then
-    naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
+    naughty.notify({ title = "warning", text = "/ partition ran out!\nmake some room",
     timeout = 10,
     position = "top_right",
     fg = beautiful.fg_urgent,
@@ -179,7 +180,7 @@ end
 function rettab.fsholo(widget, args)
   if ( args[viewformat] >= 90 ) then
       if ( args[viewformat] >= 99 and too_much == false ) then
-        naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
+        naughty.notify({ title = "warning", text = "/ partition ran out!\nmake some room",
         timeout = 7,
         position = "top_right",
         fg = beautiful.fg_urgent,
@@ -197,7 +198,7 @@ function rettab.fscol(widget, args)
     if args[viewformat] >= 90 and args[viewformat] < 99 then
         return colwhi .. args[viewformat] .. "%" .. coldef
     elseif args[viewformat] >= 99 then
-        naughty.notify({ title = "warning", text = "/share partition ran out!\nmake some room",
+        naughty.notify({ title = "warning", text = "/ partition ran out!\nmake some room",
                             timeout = 10,
                             position = "top_right",
                             fg = beautiful.fg_urgent,
