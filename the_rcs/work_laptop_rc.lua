@@ -10,14 +10,15 @@ local menubar         = require("menubar")
 -- }}}
 -- Extra {{{
 -- Define some paths
-configdir        = awful.util.getdir("config")
-scriptdir        = configdir .. "/scripts/"
-local ror        = require("myfunctions.aweror")
-local vicious    = require("vicious")
-local app_menu   = require("my_menus.app_menu")
-local mylayouts  = require("mylayouts")
-local gen        = require("myfunctions.general")
-local mywidgets  = require("mywidgets")
+configdir       = awful.util.getdir("config")
+scriptdir       = configdir .. "/scripts/"
+local ror       = require("myfunctions.aweror")
+local vicious   = require("vicious")
+local app_menu  = require("my_menus.app_menu")
+local mylayouts = require("mylayouts")
+local gen       = require("myfunctions.general")
+local mywidgets = require("mywidgets")
+local baserules = require("commonparts.baserules")
 -- }}}
 
 -- {{{ Error Handling
@@ -471,29 +472,13 @@ awful.rules.rules = {
                      buttons = clientbuttons,
                      opacity = 1,
                      size_hints_honor = false } },
-    { rule = { class = "MPlayer" },
-      properties = { floating = true } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    { rule = { class = "VirtualBox" },
-      properties = { floating = true } },
     { rule = { name = "Mendeley Desktop" },
       properties = { floating = true } },
-    -- Set Xmessage windows to always float
-    { rule = { class = "Xmessage" },
-      properties = { floating = true } },
-    -- Set tk interfaces to float and have the menubar
-    { rule = { class = "Tk" },
-      properties = { floating = true } },
-    { rule = { name = "Figure 1" },
-      properties = { floating = true } },
-    { rule = { class = "feh" },
-      properties = { floating = true } },
-    { rule = { class = "XTerm" },
-      properties = { opacity = 0.6 } },
-    { rule = { class = "ROX-Filer" },
-      properties = { floating = true } },
 }
+local numrulessofar = #awful.rules.rules
+for k,v in pairs(baserules) do awful.rules.rules[k + numrulessofar] = v end
 -- }}}
 
 -- {{{ Signals

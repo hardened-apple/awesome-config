@@ -17,6 +17,7 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local baserules  = require("commonparts.baserules")
 -- }}}
 
 -- {{{ Error Handling
@@ -459,19 +460,11 @@ awful.rules.rules = {
                      buttons = clientbuttons,
                      opacity = 1,
                      size_hints_honor = false } },
-    { rule = { class = "MPlayer" },
-      properties = { floating = true } },
     { rule = { class = "Firefox" },
       properties = { tag = tags[1][9], floating = true } },
-    { rule = { class = "Xmessage" },
-      properties = { floating = true } },
-    { rule = { class = "Tk" },
-      properties = { floating = true } },
-    { rule = { class = "feh" },
-      properties = { floating = true } },
-    { rule = { class = "XTerm" },
-      properties = { opacity = 0.6 } },
 }
+local numrulessofar = #awful.rules.rules
+for k,v in pairs(baserules) do awful.rules.rules[k + numrulessofar] = v end
 -- }}}
 
 -- {{{ Signals
