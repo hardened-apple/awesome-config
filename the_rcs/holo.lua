@@ -25,6 +25,7 @@ local vicious    = require("vicious")
 local app_menu   = require("my_menus.app_menu")
 local mylayouts  = require("mylayouts")
 local gen        = require("myfunctions.general")
+local commonvars = require("commonparts.variables")
 local baserules  = require("commonparts.baserules")
 -- }}}
 
@@ -59,15 +60,15 @@ end
 beautiful.init(configdir .. "/themes/holo/theme.lua")
 
 mywiboxhgt = 32
-terminal = "xterm"
-editor = os.getenv("EDITOR") or "vim"
-editor_cmd = terminal .. " -e " .. editor
+
+terminal = commonvars.terminal
+editor = commonvars.editor
+editor_cmd = commonvars.editor_cmd
+modkey = commonvars.modkey
+altkey = commonvars.altkey
 gui_editor = "gvim"
 wifi = terminal .. " -e sudo wifi-menu "
 musicplr = terminal .. " -g 130x34-320+16 -e ncmpcpp -c ~/.config/ncmpcpp/config "
-
-modkey = "Mod4"
-altkey = "Mod1"
 
 layouts =
 {

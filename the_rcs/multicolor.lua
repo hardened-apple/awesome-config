@@ -61,15 +61,12 @@ beautiful.init(configdir .. "/themes/multicolor/theme.lua")
 
 mywiboxhgt = 20
 
-terminal = "xterm"
-editor = os.getenv("EDITOR") or "vim"
-editor_cmd = terminal .. " -e " .. editor
+terminal = commonvars.terminal
+editor = commonvars.editor
+editor_cmd = commonvars.editor_cmd
+modkey = commonvars.modkey
+altkey = commonvars.altkey
 tasks = terminal .. " -e htop "
-
--- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
-modkey = "Mod4"
-altkey = "Mod1"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =

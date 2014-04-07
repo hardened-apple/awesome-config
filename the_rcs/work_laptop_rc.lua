@@ -54,14 +54,11 @@ beautiful.init(configdir .. "/themes/personal/theme.lua")
 mywiboxhgt = 15
 
 -- This is used later as the default terminal and editor to run.
-terminal = "xterm"
-editor = os.getenv("EDITOR") or "nano"
-editor_cmd = terminal .. " -e " .. editor
-
--- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
-modkey = "Mod4"
-altkey = "Mod1"
+terminal = commonvars.terminal
+editor = commonvars.editor
+editor_cmd = commonvars.editor_cmd
+modkey = commonvars.modkey
+altkey = commonvars.altkey
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =

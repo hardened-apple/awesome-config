@@ -63,16 +63,13 @@ beautiful.init(configdir .. "/themes/steamburn/theme.lua")
 mywiboxhgt = 18
 
 -- This is used later as the default terminal and editor to run.
-terminal = "xterm"
-editor = os.getenv("EDITOR") or "nano"
-editor_cmd = terminal .. " -e " .. editor
+terminal = commonvars.terminal
+editor = commonvars.editor
+editor_cmd = commonvars.editor_cmd
+modkey = commonvars.modkey
+altkey = commonvars.altkey
 wifi = terminal .. " -e sudo wifi-menu "
 musicplr = terminal .. " -g 78x22 -e ncmpcpp"
-
--- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
-modkey = "Mod4"
-altkey = "Mod1"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
