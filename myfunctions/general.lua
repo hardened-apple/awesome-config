@@ -4,7 +4,6 @@ local beautiful = require("beautiful")
 local io        = require("io")
 local os        = require("os")
 local tonumber  = tonumber
-local commonvars = require("commonparts.variables")
 
 rettab = {}
 
@@ -40,9 +39,9 @@ function rettab.wifinorm(widget, args)
 end
 
 function rettab.wifiholo(widget, args)
-    if args["{" .. commonvars.wcard .. " carrier}"] == 0 then
+    if args["{" .. wcard .. " carrier}"] == 0 then
        if no_net_shown == true then
-         naughty.notify({ title = "" .. commonvars.wcard .. "", text = "No carrier",
+         naughty.notify({ title = "" .. wcard .. "", text = "No carrier",
          timeout = 7,
          position = "top_left",
          icon = beautiful.widget_no_net_notify,
@@ -59,7 +58,7 @@ function rettab.wifiholo(widget, args)
          netup_icon:set_image(beautiful.net_up)
          no_net_shown = true
        end
-       return holowhite .. "<span font='Tamsyn 2'> </span>" .. args["{" .. commonvars.wcard .. " down_kb}"] .. " - " .. args["{" .. commonvars.wcard .. " up_kb}"] .. "<span font='Tamsyn 2'> </span>" .. coldef
+       return holowhite .. "<span font='Tamsyn 2'> </span>" .. args["{" .. wcard .. " down_kb}"] .. " - " .. args["{" .. wcard .. " up_kb}"] .. "<span font='Tamsyn 2'> </span>" .. coldef
     end
 end
 -- }}}
