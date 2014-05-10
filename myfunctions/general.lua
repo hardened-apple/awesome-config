@@ -533,7 +533,7 @@ function rettab.run_script(script, myprompt, promptbox)
 end
 
 mythemes = {multicolor = "awesome", steamburn = "awesome", muted = "awesome",
-            main = "awesome", dust = "awesome", holo = "awesome", shifty = "awesome",
+            main = "awesome", dust = "awesome", holo = "awesome", 
             pek_woman = "pek", pek_build = "pek", pek_pier = "pek",
             pek_windmill = "pek", subtle_new = "subtle", subtle_orig = "subtle"}
 

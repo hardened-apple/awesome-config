@@ -22,7 +22,6 @@ setupnewawesome () {
 }
 
 # Define the rc locations
-SHIFTYRC=~/.config/awesome/the_rcs/shifty.lua
 HOLORC=~/.config/awesome/the_rcs/holo.lua
 DUSTRC=~/.config/awesome/the_rcs/dust.lua
 MULTICOLORRC=~/.config/awesome/the_rcs/multicolor.lua
@@ -32,7 +31,6 @@ MAINRC=~/.config/awesome/the_rcs/main.lua
 
 
 # Define the xresources colour locations
-SHIFTYCOLS=~/xresources/awesome_personal_resources
 HOLOCOLS=~/xresources/holo
 DUSTCOLS=~/xresources/vinyl
 MULTICOLORCOLS=~/xresources/dremora
@@ -65,9 +63,6 @@ case $1 in
         subtle_start subtle_initial_resources block_colours_woman_sunglasses.jpg
         ;;
 
-    "shifty")  
-        setupnewawesome $SHIFTYRC $SHIFTYCOLS
-        ;;
 
     "holo")
         setupnewawesome $HOLORC $HOLOCOLS

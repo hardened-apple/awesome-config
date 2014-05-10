@@ -1,10 +1,6 @@
 local ipairs = ipairs
 local math   = math
 
--- Not sure why, but with shifty rc the order with which the clients are
--- numbered is different - hence I have to change the order here to keep
--- the non-moving property of the layout
-
 local revthreep = {}
 
 local function do_three(p)
