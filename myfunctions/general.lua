@@ -525,13 +525,6 @@ end
 -- }}}
 
 -- {{{ change theme
-function rettab.run_script(script, myprompt, promptbox)
-    awful.prompt.run({prompt=myprompt}, promptbox[mouse.screen].widget,
-                        function(text)
-                            os.execute(script .. text)
-                        end)
-end
-
 mythemes = {multicolor = "awesome", steamburn = "awesome", muted = "awesome",
             main = "awesome", dust = "awesome", holo = "awesome", 
             pek_woman = "pek", pek_build = "pek", pek_pier = "pek",
