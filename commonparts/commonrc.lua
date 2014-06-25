@@ -185,26 +185,6 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end),
 
-    awful.key({ altkey,           }, "k",
-        function ()
-            awful.client.focus.bydirection("up")
-            if client.focus then client.focus:raise() end
-        end),
-    awful.key({ altkey,           }, "j",
-        function ()
-            awful.client.focus.bydirection("down")
-            if client.focus then client.focus:raise() end
-        end),
-    awful.key({ altkey,           }, "h",
-        function ()
-            awful.client.focus.bydirection("left")
-            if client.focus then client.focus:raise() end
-        end),
-    awful.key({ altkey,           }, "l",
-        function ()
-            awful.client.focus.bydirection("right")
-            if client.focus then client.focus:raise() end
-        end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -247,7 +227,7 @@ globalkeys = awful.util.table.join(
     -- Calendar pop-up
     awful.key({ altkey,           }, "c",     function () gen.show_calendar(5, 0) end),
 
-    awful.key({altkey}, "t",
+    awful.key({modkey, "Control"}, "t",
               function()
                   awful.prompt.run({ prompt = "Change theme: " },
                                     mypromptbox[mouse.screen].widget,
